@@ -119,6 +119,10 @@ public class DrawView extends View {
         return mBitmap;
     }
 
+    public boolean hasPaths () {
+        return paths.size() > 0;
+    }
+
     //this is the main method where the actual drawing takes place
 
         // Need to switch current shapes and extc... github library
@@ -187,6 +191,10 @@ public class DrawView extends View {
         float x = event.getX();
         float y = event.getY();
 
+
+
+//        onTouchEventLine(event);
+
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 touchStart(x, y);
@@ -213,6 +221,35 @@ public class DrawView extends View {
 //------------------------------------------------------------------
 // Line//
 // ------------------------------------------------------------------
+
+    private void onDrawLine(Canvas canvas) {
+
+        float dx = Math.abs(mx - mStartX);
+        float dy = Math.abs(my - mStartY);
+        if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
+            canvas.drawLine(mStartX, mStartY, mx, my, mPaint);
+        }
+    }
+
+    private void onTouchEventLine(MotionEvent event) {
+
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                isDrawing = true;
+                mStartX = mx;
+                mStartY = my;
+                invalidate();
+                break;
+            case MotionEvent.ACTION_MOVE:
+                invalidate();
+                break;
+            case MotionEvent.ACTION_UP:
+                isDrawing = false;
+                mCanvas.drawLine(mStartX, mStartY, mx, my, mPaintFinal);
+                invalidate();
+                break;
+        }
+    }
 
 
 //private void onDrawLine (Canvas canvas) {

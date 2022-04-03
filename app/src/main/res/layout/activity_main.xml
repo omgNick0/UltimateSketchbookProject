@@ -26,6 +26,15 @@
                 android:src="@drawable/ic_undo"
                 android:text="Undo" />
 
+            <ImageView
+                android:id="@+id/btn_redo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:scaleType="center"
+                android:rotationY="180"
+                android:src="@drawable/ic_undo" />
+
             <ImageButton
                 android:id="@+id/btn_save"
                 android:layout_width="wrap_content"
