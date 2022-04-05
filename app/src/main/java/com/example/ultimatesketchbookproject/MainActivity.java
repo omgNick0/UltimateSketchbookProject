@@ -1,6 +1,7 @@
 package com.example.ultimatesketchbookproject;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
@@ -20,11 +21,17 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.google.android.material.slider.RangeSlider;
+import com.google.android.material.snackbar.Snackbar;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.karumi.dexter.listener.single.DialogOnDeniedPermissionListener;
+import com.karumi.dexter.listener.single.PermissionListener;
+import com.karumi.dexter.listener.single.SnackbarOnDeniedPermissionListener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -32,9 +39,14 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.security.Permission;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Locale;
 
 import top.defaults.colorpicker.ColorPickerPopup;
@@ -50,12 +62,14 @@ public class MainActivity extends AppCompatActivity {
     // help in selecting the width of the Stroke
     private RangeSlider rangeSlider;
 
+    private boolean access;
+
     private Bitmap bitmap;
 
 
     private static String filename;
     private File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-    private File file = new File(path, "DemoPicture.jpg");
+    private File file = new File(path, "What?");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,10 +114,24 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 try {
                     saveImage();
-                    Toast.makeText(MainActivity.this, "Saved successfully!", Toast.LENGTH_SHORT).show();
+                    Snackbar snackbar = Snackbar.make(view, "Successfully saved!", Snackbar.LENGTH_LONG);
+                    snackbar.setAction("OK", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            snackbar.dismiss();
+                        }
+                    });
+                    snackbar.show();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Toast.makeText(MainActivity.this, "Error occurred!", Toast.LENGTH_SHORT).show();
+                    Snackbar snackbar = Snackbar.make(view, "Some error occurred...", Snackbar.LENGTH_LONG);
+                    snackbar.setAction("MORE...", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Toast.makeText(getApplicationContext(), "Check your storage and try again", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    snackbar.show();
                 }
             }
         });
@@ -197,18 +225,46 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void askPermission() {
-        Dexter.withContext(this).withPermissions(Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                .withListener(new MultiplePermissionsListener() {
-                    @Override
-                    public void onPermissionsChecked(MultiplePermissionsReport multiplePermissionsReport) {
-                        Toast.makeText(MainActivity.this, "Granted!", Toast.LENGTH_SHORT).show();
-                    }
+//    private void askPermission() {
+//        Dexter.withContext(this).withPermissions(Manifest.permission.READ_EXTERNAL_STORAGE,
+//                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                .withListener(new MultiplePermissionsListener() {
+//                    @Override
+//                    public void onPermissionsChecked(MultiplePermissionsReport multiplePermissionsReport) {
+//                        List<PermissionDeniedResponse> lstOfPermission = multiplePermissionsReport.getDeniedPermissionResponses();
+//                        if (lstOfPermission.size() > 0) {
+//                            for (PermissionDeniedResponse response: lstOfPermission) {
+//                                System.out.println(response);
+//                            }
+//                            Toast.makeText(getApplicationContext(), "Access to memory was denied!", Toast.LENGTH_SHORT).show();
+//                        } else {
+//                            Toast.makeText(MainActivity.this, "Granted!", Toast.LENGTH_SHORT).show();
+//
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> list, PermissionToken permissionToken) {
+//                        permissionToken.continuePermissionRequest();
+//                    }
+//                }).check();
+//    }
 
-                    @Override
-                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> list, PermissionToken permissionToken) {
-                        permissionToken.continuePermissionRequest();
+    private void askPermission () {
+        Dexter.withContext(this)
+                .withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .withListener(new PermissionListener() {
+                    @Override public void onPermissionGranted(PermissionGrantedResponse response) {
+                        access = true;
+                        Toast.makeText(getApplicationContext(), "Granted!!", Toast.LENGTH_SHORT).show();
+                    }
+                    @Override public void onPermissionDenied(PermissionDeniedResponse response) {
+                        access = false;
+                        Toast.makeText(getApplicationContext(), "Denied!", Toast.LENGTH_SHORT).show();
+
+                    }
+                    @Override public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
+                        token.continuePermissionRequest();
                     }
                 }).check();
     }
@@ -218,7 +274,7 @@ public class MainActivity extends AppCompatActivity {
         Bitmap bitmap = paint.save();
 
 
-        if (paint.hasPaths()) {
+        if (paint.hasPaths() && access) {
             try {
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.PNG, 0, bos);
@@ -239,7 +295,10 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
                 Toast.makeText(MainActivity.this, "Another Error occurred!", Toast.LENGTH_SHORT).show();
             }
+        } else if (!access) {
+            // some code...
         } else
             Toast.makeText(getApplicationContext(), "Your painting is empty!", Toast.LENGTH_SHORT).show();
+
     }
 }
