@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static String filename;
     private File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-    private File file = new File(path, "DemoPicture.jpg");
+    private File file = new File(path, "Paintings");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
