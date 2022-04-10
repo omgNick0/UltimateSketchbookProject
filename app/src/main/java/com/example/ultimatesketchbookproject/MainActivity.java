@@ -39,6 +39,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.Permission;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -69,7 +71,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static String filename;
     private File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-    private File file = new File(path, "What?");
+    private File file = new File("Program Directory", "Paintings"); // Directory / Subdirectory
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

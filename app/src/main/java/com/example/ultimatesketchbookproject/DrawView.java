@@ -80,7 +80,7 @@ public class DrawView extends View {
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         //0xff=255 in decimal
         mPaint.setAlpha(0xff);
-
+//        init(getWidth(), getHeight()); // what is that
     }
 
     //this method instantiate the bitmap and object
@@ -257,9 +257,14 @@ public class DrawView extends View {
 //}
 
 
+// code later  ....
 
 
 
+
+//------------------------------------------------------------------
+// Rectangle//
+// ------------------------------------------------------------------
 
 
 
