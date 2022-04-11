@@ -7,11 +7,30 @@
     tools:context=".MainActivity">
 
 
+    <com.example.ultimatesketchbookproject.DrawView
+        android:id="@+id/draw_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/linear"
+        android:layout_centerInParent="true" />
+
+
     <LinearLayout
         android:id="@+id/linear"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:animateLayoutChanges="false"
         android:orientation="vertical">
+
+
+        <com.google.android.material.slider.RangeSlider
+            android:id="@+id/rangebar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="0dp"
+            android:visibility="gone" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -31,8 +50,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:scaleType="center"
                 android:rotationY="180"
+                android:scaleType="center"
                 android:src="@drawable/ic_undo" />
 
             <ImageButton
@@ -63,20 +82,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
-            <com.google.android.material.slider.RangeSlider
-                android:id="@+id/rangebar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>
 
-    <com.example.ultimatesketchbookproject.DrawView
-        android:id="@+id/draw_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/linear"
-        android:layout_centerInParent="true" />
 </RelativeLayout>

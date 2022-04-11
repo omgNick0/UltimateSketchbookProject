@@ -14,6 +14,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 
 public class DrawView extends View {
@@ -37,6 +38,7 @@ public class DrawView extends View {
     private Paint mPaint;
     //ArrayList to store all the strokes drawn by the user on the Canvas
     private ArrayList<Stroke> paths = new ArrayList<>();
+    private Stack<Stroke> removedPaths = new Stack<>(); // Stack data structure. LIFO Method used
     private int currentColor;
     private int strokeWidth;
 
@@ -109,10 +111,20 @@ public class DrawView extends View {
         //check whether the List is empty or not
         //if empty, the remove method will return an error
         if (paths.size() != 0) {
+            removedPaths.add(paths.get(paths.size() - 1));
             paths.remove(paths.size() - 1);
             invalidate();
         }
     }
+
+    public void redo() {
+        if (removedPaths.size() != 0) {
+            paths.add(removedPaths.pop());
+            invalidate();
+        }
+    }
+
+
 
     //this methods returns the current bitmap
     public Bitmap save() {
