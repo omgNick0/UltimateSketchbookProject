@@ -55,12 +55,13 @@
 <!--                android:src="@drawable/ic_redo_custom" />-->
 
             <ImageButton
-                android:id="@+id/btn_save"
+                android:id="@+id/btn_stroke"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:src="@drawable/ic_paint_brush"
-                android:text="Save" />
+                android:text="Stroke" />
+
 
             <ImageButton
                 android:id="@+id/btn_color"
@@ -71,12 +72,12 @@
                 android:text="Color" />
 
             <ImageButton
-                android:id="@+id/btn_stroke"
+                android:id="@+id/btn_save"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:src="@drawable/ic_floppy_disk"
-                android:text="Stroke" />
+                android:text="Save" />
         </LinearLayout>
 
         <LinearLayout
