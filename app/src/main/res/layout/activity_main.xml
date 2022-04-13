@@ -37,29 +37,29 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <ImageButton
-                android:id="@+id/btn_undo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:src="@drawable/ic_undo"
-                android:text="Undo" />
+<!--            <ImageButton-->
+<!--                android:id="@+id/btn_undo"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:src="@drawable/ic_redo_custom"-->
+<!--                android:text="Undo" />-->
 
-            <ImageButton
-                android:id="@+id/btn_redo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:rotationY="180"
-                android:scaleType="center"
-                android:src="@drawable/ic_undo" />
+<!--            <ImageButton-->
+<!--                android:id="@+id/btn_redo"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:rotationY="180"-->
+<!--                android:scaleType="center"-->
+<!--                android:src="@drawable/ic_redo_custom" />-->
 
             <ImageButton
                 android:id="@+id/btn_save"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:src="@drawable/ic_floppy_disk"
+                android:src="@drawable/ic_paint_brush"
                 android:text="Save" />
 
             <ImageButton
@@ -75,7 +75,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:src="@drawable/ic_paint_brush"
+                android:src="@drawable/ic_floppy_disk"
                 android:text="Stroke" />
         </LinearLayout>
 

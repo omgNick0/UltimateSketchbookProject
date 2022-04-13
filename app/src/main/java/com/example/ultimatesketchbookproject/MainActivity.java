@@ -9,6 +9,9 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ImageButton;
@@ -42,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     //in order to get the reference of the View
     private DrawView paint;
     //creating objects of type button
-    private ImageButton save, color, stroke, undo, redo;
+    private ImageButton save, color, stroke;
     //creating a RangeSlider object, which will
     // help in selecting the width of the Stroke
     private RangeSlider rangeSlider;
@@ -59,11 +62,41 @@ public class MainActivity extends AppCompatActivity {
     private List<PermissionDeniedResponse> deniedResponses;
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_activity_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.item1:
+                paint.undo();
+                return true;
+            case R.id.item2:
+                paint.redo();
+                return true;
+            case R.id.item3:
+                Toast.makeText(this, "Item 3 selected", Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.subitem1:
+                Toast.makeText(this, "Sub Item 1 selected", Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.subitem2:
+                Toast.makeText(this, "Sub Item 2 selected", Toast.LENGTH_SHORT).show();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        askPermission(); // Asks users permission for reading and writing external storage memory
+//        askPermission(); // Asks users permission for reading and writing external storage memory // todo watch func in the end
 ////        Log.d(TAG, "Permission asked!");
 
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault());
@@ -80,8 +113,8 @@ public class MainActivity extends AppCompatActivity {
         //getting the reference of the views from their ids
         paint = (DrawView) findViewById(R.id.draw_view);
         rangeSlider = (RangeSlider) findViewById(R.id.rangebar);
-        undo = (ImageButton) findViewById(R.id.btn_undo);
-        redo = (ImageButton) findViewById(R.id.btn_redo);
+//        undo = (ImageButton) findViewById(R.id.btn_undo);
+//        redo = (ImageButton) findViewById(R.id.btn_redo);
         save = (ImageButton) findViewById(R.id.btn_save);
         color = (ImageButton) findViewById(R.id.btn_color);
         stroke = (ImageButton) findViewById(R.id.btn_stroke);
@@ -89,9 +122,9 @@ public class MainActivity extends AppCompatActivity {
         //creating a OnClickListener for each button, to perform certain actions
 
         //the undo button will remove the most recent stroke from the canvas
-        undo.setOnClickListener(view -> paint.undo());
-
-        redo.setOnClickListener(view -> paint.redo());
+//        undo.setOnClickListener(view -> paint.undo());
+//
+//        redo.setOnClickListener(view -> paint.redo());
         //the save button will save the current canvas which is actually a bitmap
         //in form of PNG, in the storage
 
@@ -194,7 +227,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void askPermission() {
+    private void askPermission() { // todo feature this func
+        // todo 1) NullPointer Exception error appearing
+        // todo 2) Maybe need to add .withErrorHandler(...) in the end
+        // todo 3) Search in google for problem
         Dexter.withContext(this).withPermissions(Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE).withListener(new MultiplePermissionsListener() {
             @Override
