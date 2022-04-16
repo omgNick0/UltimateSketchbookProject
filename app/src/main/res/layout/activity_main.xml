@@ -14,13 +14,12 @@
         android:layout_above="@+id/linear"
         android:layout_centerInParent="true" />
 
-
     <LinearLayout
         android:id="@+id/linear"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:animateLayoutChanges="false"
+        android:animateLayoutChanges="true"
         android:orientation="vertical">
 
 
@@ -30,59 +29,71 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="0dp"
             android:layout_marginBottom="0dp"
+            android:outlineSpotShadowColor="@color/teal_200"
             android:visibility="gone" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:orientation="horizontal">
 
-<!--            <ImageButton-->
-<!--                android:id="@+id/btn_undo"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_weight="1"-->
-<!--                android:src="@drawable/ic_redo_custom"-->
-<!--                android:text="Undo" />-->
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:id="@+id/btn_instruments"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                app:icon="@drawable/ic_instruments"
+                app:iconGravity="top"
+                app:iconTint="@color/white"
+                app:backgroundTint="@color/teal_200"
+                app:fabSize="normal" />
 
-<!--            <ImageButton-->
-<!--                android:id="@+id/btn_redo"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_weight="1"-->
-<!--                android:rotationY="180"-->
-<!--                android:scaleType="center"-->
-<!--                android:src="@drawable/ic_redo_custom" />-->
-
-            <ImageButton
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
                 android:id="@+id/btn_stroke"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:src="@drawable/ic_paint_brush"
-                android:text="Stroke" />
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                app:icon="@drawable/ic_brush"
+                app:iconGravity="top"
+                app:iconTint="@color/ic_brush_color"
+                app:backgroundTint="@color/teal_200"
+                app:fabSize="normal" />
 
 
-            <ImageButton
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
                 android:id="@+id/btn_color"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:src="@drawable/ic_colorpicker"
-                android:text="Color" />
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                app:icon="@drawable/ic_colorpicker"
+                app:iconGravity="top"
+                app:iconTint="@color/white"
+                app:backgroundTint="@color/teal_200"
+                app:fabSize="normal" />
+            <!--                app:iconTint="#F5FF4B"-->
 
-            <ImageButton
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
                 android:id="@+id/btn_save"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
                 android:layout_weight="1"
-                android:src="@drawable/ic_floppy_disk"
-                android:text="Save" />
+                android:shadowColor="@color/white"
+                app:backgroundTint="@color/teal_200"
+                app:fabSize="normal"
+                app:iconTint="@color/white"
+                app:icon="@drawable/ic_save"
+                app:iconGravity="top" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="100"
             android:orientation="horizontal">
 
         </LinearLayout>

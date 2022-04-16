@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name" translatable="false">Ultimate Sketchbook Project</string>
     <string name="import_picture">Import picture</string>
+    <string name="export_picture">Export picture</string>
+    <string name="save_picture">Save image</string>
 </resources>

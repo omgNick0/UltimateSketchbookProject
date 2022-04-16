@@ -7,6 +7,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -19,19 +21,7 @@ import java.util.Stack;
 
 public class DrawView extends View {
 
-    protected static final int LINE = 1; // from 22 to 27 can be public
-    protected static final int RECTANGLE = 3;
-    protected static final int SQUARE = 4;
-    protected static final int CIRCLE = 5;
-    protected static final int TRIANGLE = 6;
-    protected static final int SMOOTHLINE = 2;
-
-
-
     private static final float TOUCH_TOLERANCE = 4;
-    private static final float TOUCH_STROKE_WIDTH = 5;
-
-    public int mCurrentShape;
 
 
     private float mX, mY;
@@ -46,22 +36,11 @@ public class DrawView extends View {
     //the Paint class encapsulates the color and style information about
     //how to draw the geometries,text and bitmaps
     private Path mPath;
-    protected Paint mPaintFinal;
     private Bitmap mBitmap;
     private Canvas mCanvas;
-    private Paint mBitmapPaint = new Paint(Paint.DITHER_FLAG);
+    private final Paint mBitmapPaint = new Paint(Paint.DITHER_FLAG);
 
 
-    protected boolean isDrawing = false;
-    protected boolean isDrawingEnded = false;
-
-
-    private float mStartX;
-    private float mStartY;
-
-
-    private float mx;
-    private float my;
 
 
 
@@ -100,6 +79,9 @@ public class DrawView extends View {
     //sets the current color of stroke
     public void setColor(int color) {
         currentColor = color;
+    }
+    public int getColor() {
+        return currentColor;
     }
 
     //sets the stroke width
@@ -233,35 +215,6 @@ public class DrawView extends View {
 //------------------------------------------------------------------
 // Line//
 // ------------------------------------------------------------------
-
-    private void onDrawLine(Canvas canvas) {
-
-        float dx = Math.abs(mx - mStartX);
-        float dy = Math.abs(my - mStartY);
-        if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
-            canvas.drawLine(mStartX, mStartY, mx, my, mPaint);
-        }
-    }
-
-    private void onTouchEventLine(MotionEvent event) {
-
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                isDrawing = true;
-                mStartX = mx;
-                mStartY = my;
-                invalidate();
-                break;
-            case MotionEvent.ACTION_MOVE:
-                invalidate();
-                break;
-            case MotionEvent.ACTION_UP:
-                isDrawing = false;
-                mCanvas.drawLine(mStartX, mStartY, mx, my, mPaintFinal);
-                invalidate();
-                break;
-        }
-    }
 
 
 //private void onDrawLine (Canvas canvas) {

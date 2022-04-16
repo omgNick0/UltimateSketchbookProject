@@ -1,9 +1,15 @@
 package com.example.ultimatesketchbookproject;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -14,10 +20,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.slider.RangeSlider;
+import com.google.android.material.snackbar.Snackbar;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -25,7 +32,9 @@ import com.karumi.dexter.listener.DexterError;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.PermissionRequestErrorListener;
+import com.karumi.dexter.listener.multi.DialogOnAnyDeniedMultiplePermissionsListener;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.karumi.dexter.listener.multi.SnackbarOnAnyDeniedMultiplePermissionsListener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -37,18 +46,27 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
 import top.defaults.colorpicker.ColorPickerPopup;
 
 
 public class MainActivity extends AppCompatActivity {
+
     //creating the object of type DrawView
     //in order to get the reference of the View
     private DrawView paint;
+
     //creating objects of type button
-    private ImageButton save, color, stroke;
+
+    private ExtendedFloatingActionButton save, colorPicker, stroke; // 4th btn to open chat with other users
+
     //creating a RangeSlider object, which will
     // help in selecting the width of the Stroke
     private RangeSlider rangeSlider;
+
+    private static final int REQUEST_CODE = 123;
+    private boolean isGranted = false;
 
     private Bitmap bitmap;
 
@@ -80,12 +98,12 @@ public class MainActivity extends AppCompatActivity {
             case R.id.item3:
                 Toast.makeText(this, "Item 3 selected", Toast.LENGTH_SHORT).show();
                 return true;
-            case R.id.subitem1:
-                Toast.makeText(this, "Sub Item 1 selected", Toast.LENGTH_SHORT).show();
-                return true;
-            case R.id.subitem2:
-                Toast.makeText(this, "Sub Item 2 selected", Toast.LENGTH_SHORT).show();
-                return true;
+//            case R.id.subitem1:
+//                Toast.makeText(this, "Sub Item 1 selected", Toast.LENGTH_SHORT).show();
+//                return true;
+//            case R.id.subitem2:
+//                Toast.makeText(this, "Sub Item 2 selected", Toast.LENGTH_SHORT).show();
+//                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -96,8 +114,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        askPermission(); // Asks users permission for reading and writing external storage memory // todo watch func in the end
-////        Log.d(TAG, "Permission asked!");
 
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault());
         String date = format.format(new Date());
@@ -111,13 +127,14 @@ public class MainActivity extends AppCompatActivity {
 
 
         //getting the reference of the views from their ids
+
         paint = (DrawView) findViewById(R.id.draw_view);
         rangeSlider = (RangeSlider) findViewById(R.id.rangebar);
-//        undo = (ImageButton) findViewById(R.id.btn_undo);
-//        redo = (ImageButton) findViewById(R.id.btn_redo);
-        save = (ImageButton) findViewById(R.id.btn_save);
-        color = (ImageButton) findViewById(R.id.btn_color);
-        stroke = (ImageButton) findViewById(R.id.btn_stroke);
+        save = (ExtendedFloatingActionButton) findViewById(R.id.btn_save);
+        colorPicker = (ExtendedFloatingActionButton) findViewById(R.id.btn_color);
+        stroke = (ExtendedFloatingActionButton) findViewById(R.id.btn_stroke);
+
+
 
         //creating a OnClickListener for each button, to perform certain actions
 
@@ -130,47 +147,16 @@ public class MainActivity extends AppCompatActivity {
 
         save.setOnClickListener(view -> {
             try {
+                askPermission();
                 saveImage();
-                Toast.makeText(MainActivity.this, "Saved successfully!", Toast.LENGTH_SHORT).show();
             } catch (IOException e) {
                 e.printStackTrace();
-                Toast.makeText(MainActivity.this, "Error occurred!", Toast.LENGTH_SHORT).show();
             }
         });
-//        save.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                //getting the bitmap from DrawView class
-//                Bitmap bmp=paint.save();
-//                //opening a OutputStream to write into the file
-//                OutputStream imageOutStream = null;
-//
-//                ContentValues cv=new ContentValues();
-//                //name of the file
-//                cv.put(MediaStore.Images.Media.DISPLAY_NAME, "drawing.png");
-//                //type of the file
-//                cv.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
-//                //location of the file to be saved
-//                cv.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
-//
-//                //get the Uri of the file which is to be v=created in the storage
-//                Uri uri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv);
-//                try {
-//                    //open the output stream with the above uri
-//                    imageOutStream = getContentResolver().openOutputStream(uri);
-//                    //this method writes the files in storage
-//                    bmp.compress(Bitmap.CompressFormat.PNG, 100, imageOutStream);
-//                    //close the output stream after use
-//                    imageOutStream.close();
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//
-//            }
-//        });
+
         //the color button will allow the user to select the color of his brush
 
-        color.setOnClickListener(new View.OnClickListener() {
+        colorPicker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 new ColorPickerPopup.Builder(MainActivity.this)
@@ -185,6 +171,7 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onColorPicked(int color) {
                                 paint.setColor(color);
+                                colorPicker.setBackgroundColor(paint.getColor());
                             }
                         });
             }
@@ -206,6 +193,7 @@ public class MainActivity extends AppCompatActivity {
         //adding a OnChangeListener which will change the stroke width
         //as soon as the user slides the slider
         rangeSlider.addOnChangeListener(new RangeSlider.OnChangeListener() {
+            @SuppressLint("RestrictedApi")
             @Override
             public void onValueChange(@NonNull RangeSlider slider, float value, boolean fromUser) {
                 paint.setStrokeWidth((int) value);
@@ -226,37 +214,48 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
-    private void askPermission() { // todo feature this func
-        // todo 1) NullPointer Exception error appearing
-        // todo 2) Maybe need to add .withErrorHandler(...) in the end
-        // todo 3) Search in google for problem
-        Dexter.withContext(this).withPermissions(Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE).withListener(new MultiplePermissionsListener() {
-            @Override
-            public void onPermissionsChecked(MultiplePermissionsReport multiplePermissionsReport) {
-                if (multiplePermissionsReport.areAllPermissionsGranted()) {
-                    if (deniedResponses.size() > 0)
-                        deniedResponses.clear();
-                    Toast.makeText(MainActivity.this, "All permissions are granted!", Toast.LENGTH_SHORT).show();
-                } else {
-                    deniedResponses = multiplePermissionsReport.getDeniedPermissionResponses();
-                    for (PermissionDeniedResponse response: deniedResponses) {
-                        System.out.println("Denied responses: " + response);
+    private void askPermission() {
+        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)
+        + ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        != PackageManager.PERMISSION_GRANTED) { // Permissions are not granted
+            isGranted = false;
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) ||
+            ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                // Create AlertDialog
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Grant permission");
+                builder.setMessage("If you want to save your drawings, you need to grant permission");
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        ActivityCompat.requestPermissions(
+                                MainActivity.this,
+                                new String[] {
+                                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                                },
+                                REQUEST_CODE
+                        );
                     }
-                }
+                });
+                builder.setNegativeButton("Cancel", null);
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+            } else {
+                ActivityCompat.requestPermissions(
+                        MainActivity.this,
+                        new String[] {
+                                Manifest.permission.READ_EXTERNAL_STORAGE,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                        },
+                        REQUEST_CODE
+                );
             }
+        } else { // When permissions are already granted
+            isGranted = true;
+            Log.d(TAG, "Permission for reading and writing granted"); // just a LOG
+        }
 
-            @Override
-            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> list, PermissionToken permissionToken) {
-                permissionToken.continuePermissionRequest();
-            }
-        }).withErrorListener(new PermissionRequestErrorListener() {
-            @Override
-            public void onError(DexterError dexterError) {
-                Log.d(TAG, dexterError.toString());
-            }
-        }).check();
     }
 
     private void saveImage() throws IOException {
@@ -264,7 +263,7 @@ public class MainActivity extends AppCompatActivity {
         Bitmap bitmap = paint.save();
 
 
-        if (paint.hasPaths()) {
+        if (paint.hasPaths() && isGranted) {
             try {
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.PNG, 0, bos);
@@ -280,7 +279,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "File was not found!", Toast.LENGTH_SHORT).show();
             } catch (NullPointerException e) {
                 e.printStackTrace();
-                Toast.makeText(MainActivity.this, "In code error occured. Please contact developer", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "In code error occurred. Please contact developer", Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
                 e.printStackTrace();
                 Toast.makeText(MainActivity.this, "Another Error occurred!", Toast.LENGTH_SHORT).show();
