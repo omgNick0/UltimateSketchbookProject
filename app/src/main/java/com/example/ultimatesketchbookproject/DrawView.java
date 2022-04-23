@@ -7,10 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -205,6 +202,10 @@ public class DrawView extends View {
         }
 
         return true;
+    }
+
+    protected void setImageBitmap(Bitmap bitmap) {
+        mCanvas.setBitmap(bitmap);
     }
 
 

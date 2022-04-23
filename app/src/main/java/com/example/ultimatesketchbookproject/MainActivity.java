@@ -1,6 +1,7 @@
 package com.example.ultimatesketchbookproject;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -9,11 +10,15 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
@@ -31,6 +37,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -58,8 +65,6 @@ public class MainActivity extends AppCompatActivity implements PassDataInterface
     private static final int REQUEST_CODE = 123;
     private boolean isGranted = false;
 
-    private Bitmap bitmap;
-
     private static final String TAG = "MainActivity";
 
 
@@ -86,12 +91,12 @@ public class MainActivity extends AppCompatActivity implements PassDataInterface
             case R.id.item3:
                 Toast.makeText(this, "Item 3 selected", Toast.LENGTH_SHORT).show();
                 return true;
-//            case R.id.subitem1:
-//                Toast.makeText(this, "Sub Item 1 selected", Toast.LENGTH_SHORT).show();
-//                return true;
-//            case R.id.subitem2:
-//                Toast.makeText(this, "Sub Item 2 selected", Toast.LENGTH_SHORT).show();
-//                return true;
+            case R.id.import_image:
+                getImageGallery();
+                return true;
+            case R.id.export_image:
+                Toast.makeText(this, "Exported!", Toast.LENGTH_SHORT).show();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -209,6 +214,37 @@ public class MainActivity extends AppCompatActivity implements PassDataInterface
         });
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        System.out.println("Data: "+ data);
+        // requestCode == REQUEST_CODE
+        if (data != null) {
+            Uri selectedImage = data.getData();
+            InputStream inputStream;
+
+            System.out.println("Data: "+ data);
+            Log.d(TAG, "info");
+
+            try {
+                inputStream = getContentResolver().openInputStream(selectedImage);
+                Bitmap image = BitmapFactory.decodeStream(inputStream);
+                DrawView drawView = (DrawView) findViewById(R.id.draw_view);
+                drawView.setImageBitmap(image);
+
+                Log.d(TAG, "Reached!");
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void getImageGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivity(intent);
+    }
+
     private void askPermission() {
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)
         + ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -227,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements PassDataInterface
                                 MainActivity.this,
                                 new String[] {
                                         Manifest.permission.READ_EXTERNAL_STORAGE,
-                                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
                                 },
                                 REQUEST_CODE
                         );
