@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/drawable/background_splash.xml" value="0.2740740740740741" />
+        <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/drawable/fragment_dialog.xml" value="0.1" />
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/drawable/ic_brush.xml" value="0.221875" />
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/drawable/ic_colorpicker.xml" value="0.22135416666666666" />
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/drawable/ic_dashboard_black_24dp.xml" value="0.25833333333333336" />
@@ -17,9 +18,10 @@
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/drawable/ic_redo.xml" value="0.19537037037037036" />
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/drawable/ic_save.xml" value="0.287962962962963" />
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/drawable/ic_undo.xml" value="0.3194444444444444" />
-        <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/layout/activity_main.xml" value="0.22" />
+        <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/layout/activity_main2.xml" value="0.22" />
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/layout/fragment_dashboard.xml" value="0.2598958333333333" />
+        <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/layout/fragment_dialog.xml" value="0.5" />
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/layout/fragment_home.xml" value="0.27395833333333336" />
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/layout/fragment_notifications.xml" value="0.27395833333333336" />
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/layout/layout.xml" value="0.27395833333333336" />
@@ -27,7 +29,7 @@
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/menu/bottom_nav_menu.xml" value="0.27395833333333336" />
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/menu/bottom_navigation_menu.xml" value="0.33" />
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/menu/example_menu.xml" value="0.1" />
-        <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/menu/main_activity_menu.xml" value="0.1" />
+        <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/menu/main_activity_menu.xml" value="0.25" />
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/menu/undo.xml" value="0.25" />
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/menu/upper_menu.xml" value="0.36666666666666664" />
       </map>

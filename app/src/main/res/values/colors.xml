@@ -9,4 +9,11 @@
     <color name="white">#FFFFFFFF</color>
     <color name="yellow">#F2FF00</color>
     <color name="ic_brush_color">#FFFFFFFF</color>
+    <color name="red">#FF0000</color>
+    <color name="base">#900C3F</color>
+    <color name="base_1">#17A589</color>
+    <color name="base_2">#581845</color>
+    <color name="base_3">#DAF7A6</color>
+    <color name="base_4">#B7950B</color>
+    <color name="base_5">#717D7E</color>
 </resources>

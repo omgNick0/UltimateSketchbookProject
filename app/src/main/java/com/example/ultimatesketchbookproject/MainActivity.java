@@ -20,21 +20,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.slider.RangeSlider;
-import com.google.android.material.snackbar.Snackbar;
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.MultiplePermissionsReport;
-import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.DexterError;
-import com.karumi.dexter.listener.PermissionDeniedResponse;
-import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.PermissionRequestErrorListener;
-import com.karumi.dexter.listener.multi.DialogOnAnyDeniedMultiplePermissionsListener;
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
-import com.karumi.dexter.listener.multi.SnackbarOnAnyDeniedMultiplePermissionsListener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -43,23 +33,23 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
-import pub.devrel.easypermissions.AfterPermissionGranted;
-import pub.devrel.easypermissions.EasyPermissions;
-import top.defaults.colorpicker.ColorPickerPopup;
+import Fragments.DialogFragment;
+import Interfaces.PassDataInterface;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements PassDataInterface {
 
     //creating the object of type DrawView
     //in order to get the reference of the View
     private DrawView paint;
+    private String colorFrom;
+    private ImageButton base_color_1, base_color_2, base_color_3, base_color_4, base_color_5, color_picker;
 
     //creating objects of type button
 
-    private ExtendedFloatingActionButton save, colorPicker, stroke; // 4th btn to open chat with other users
+    private ExtendedFloatingActionButton save, colorPicker, stroke, instruments; // 4th btn to open chat with other users
 
     //creating a RangeSlider object, which will
     // help in selecting the width of the Stroke
@@ -76,8 +66,6 @@ public class MainActivity extends AppCompatActivity {
     private static String filename;
     private final File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
     private final File file = new File(path, "Paintings");
-
-    private List<PermissionDeniedResponse> deniedResponses;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -118,13 +106,11 @@ public class MainActivity extends AppCompatActivity {
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault());
         String date = format.format(new Date());
         filename = path + "/" + date + ".png";
-
         try {
             path.mkdirs();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
 
         //getting the reference of the views from their ids
 
@@ -133,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
         save = (ExtendedFloatingActionButton) findViewById(R.id.btn_save);
         colorPicker = (ExtendedFloatingActionButton) findViewById(R.id.btn_color);
         stroke = (ExtendedFloatingActionButton) findViewById(R.id.btn_stroke);
-
+        instruments = (ExtendedFloatingActionButton) findViewById(R.id.btn_instruments);
 
 
         //creating a OnClickListener for each button, to perform certain actions
@@ -144,6 +130,15 @@ public class MainActivity extends AppCompatActivity {
 //        redo.setOnClickListener(view -> paint.redo());
         //the save button will save the current canvas which is actually a bitmap
         //in form of PNG, in the storage
+
+
+        colorPicker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DialogFragment fragment = new DialogFragment(MainActivity.this);
+                fragment.show(getFragmentManager(), "TAG");
+            }
+        });
 
         save.setOnClickListener(view -> {
             try {
@@ -156,26 +151,26 @@ public class MainActivity extends AppCompatActivity {
 
         //the color button will allow the user to select the color of his brush
 
-        colorPicker.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new ColorPickerPopup.Builder(MainActivity.this)
-                        .initialColor(Color.RED) // default color
-                        .enableAlpha(true)
-                        .okTitle("choose")
-                        .enableBrightness(true)
-                        .showIndicator(true)
-                        .showValue(true)
-                        .build()
-                        .show(view, new ColorPickerPopup.ColorPickerObserver() {
-                            @Override
-                            public void onColorPicked(int color) {
-                                paint.setColor(color);
-                                colorPicker.setBackgroundColor(paint.getColor());
-                            }
-                        });
-            }
-        });
+//        colorPicker.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                new ColorPickerPopup.Builder(MainActivity.this)
+//                        .initialColor(Color.RED) // default color
+//                        .enableAlpha(true)
+//                        .okTitle("choose")
+//                        .enableBrightness(true)
+//                        .showIndicator(true)
+//                        .showValue(true)
+//                        .build()
+//                        .show(view, new ColorPickerPopup.ColorPickerObserver() {
+//                            @Override
+//                            public void onColorPicked(int color) {
+//                                paint.setColor(color);
+//                                colorPicker.setBackgroundColor(paint.getColor());
+//                            }
+//                        });
+//            }
+//        });
         // the button will toggle the visibility of the RangeBar/RangeSlider
         stroke.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -286,5 +281,17 @@ public class MainActivity extends AppCompatActivity {
             }
         } else
             Toast.makeText(getApplicationContext(), "Your painting is empty or you didn't grant a permission!", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onDataReceived(String color) {
+        paint.setColor(Color.parseColor(color));
+        colorPicker.setBackgroundColor(Color.parseColor(color));
+    }
+
+    @Override
+    public void onDataReceived(int color) {
+        paint.setColor(color);
+        colorPicker.setBackgroundColor(color);
     }
 }
