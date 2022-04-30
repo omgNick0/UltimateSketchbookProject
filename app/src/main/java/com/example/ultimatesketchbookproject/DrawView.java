@@ -17,7 +17,6 @@ import java.util.Stack;
 
 
 public class DrawView extends View {
-
     private static final float TOUCH_TOLERANCE = 4;
 
 
@@ -36,7 +35,6 @@ public class DrawView extends View {
     private Bitmap mBitmap;
     private Canvas mCanvas;
     private final Paint mBitmapPaint = new Paint(Paint.DITHER_FLAG);
-
 
 
 

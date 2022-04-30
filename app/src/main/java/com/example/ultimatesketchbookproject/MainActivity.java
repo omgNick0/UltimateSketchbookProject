@@ -6,15 +6,18 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -52,8 +55,6 @@ public class MainActivity extends AppCompatActivity implements PassDataInterface
     //in order to get the reference of the View
     private DrawView paint;
     private String colorFrom;
-    private ImageButton base_color_1, base_color_2, base_color_3, base_color_4, base_color_5, color_picker;
-
     //creating objects of type button
 
     private ExtendedFloatingActionButton save, colorPicker, stroke, instruments; // 4th btn to open chat with other users
@@ -70,7 +71,8 @@ public class MainActivity extends AppCompatActivity implements PassDataInterface
 
     private static String filename;
     private final File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-    private final File file = new File(path, "Paintings");
+
+    private static final int REQUEST_GET_PHOTO = 1;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -93,6 +95,11 @@ public class MainActivity extends AppCompatActivity implements PassDataInterface
                 return true;
             case R.id.import_image:
                 getImageGallery();
+//                Intent intent = new Intent();
+//                intent.setType("image/*");
+//                intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+//                startActivity(Intent.createChooser(intent, "Tack Image"));
+//                dispatchTakePictureIntent();
                 return true;
             case R.id.export_image:
                 Toast.makeText(this, "Exported!", Toast.LENGTH_SHORT).show();
@@ -110,13 +117,13 @@ public class MainActivity extends AppCompatActivity implements PassDataInterface
 
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault());
         String date = format.format(new Date());
-        filename = path + "/" + date + ".png";
+        String var = "test";
+        filename = path + "/" + var + ".png";
         try {
             path.mkdirs();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         //getting the reference of the views from their ids
 
         paint = (DrawView) findViewById(R.id.draw_view);
@@ -154,28 +161,6 @@ public class MainActivity extends AppCompatActivity implements PassDataInterface
             }
         });
 
-        //the color button will allow the user to select the color of his brush
-
-//        colorPicker.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                new ColorPickerPopup.Builder(MainActivity.this)
-//                        .initialColor(Color.RED) // default color
-//                        .enableAlpha(true)
-//                        .okTitle("choose")
-//                        .enableBrightness(true)
-//                        .showIndicator(true)
-//                        .showValue(true)
-//                        .build()
-//                        .show(view, new ColorPickerPopup.ColorPickerObserver() {
-//                            @Override
-//                            public void onColorPicked(int color) {
-//                                paint.setColor(color);
-//                                colorPicker.setBackgroundColor(paint.getColor());
-//                            }
-//                        });
-//            }
-//        });
         // the button will toggle the visibility of the RangeBar/RangeSlider
         stroke.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -205,7 +190,6 @@ public class MainActivity extends AppCompatActivity implements PassDataInterface
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-
                 paint.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 int width = paint.getMeasuredWidth();
                 int height = paint.getMeasuredHeight();
@@ -217,41 +201,90 @@ public class MainActivity extends AppCompatActivity implements PassDataInterface
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        System.out.println("Data: "+ data);
-        // requestCode == REQUEST_CODE
-        if (data != null) {
-            Uri selectedImage = data.getData();
-            InputStream inputStream;
 
-            System.out.println("Data: "+ data);
-            Log.d(TAG, "info");
+        if (requestCode == REQUEST_GET_PHOTO && resultCode == Activity.RESULT_OK) {
+            if (data != null) {
 
-            try {
-                inputStream = getContentResolver().openInputStream(selectedImage);
-                Bitmap image = BitmapFactory.decodeStream(inputStream);
-                DrawView drawView = (DrawView) findViewById(R.id.draw_view);
-                drawView.setImageBitmap(image);
+                InputStream inputStream;
+                Uri selectedImage = data.getData();
 
-                Log.d(TAG, "Reached!");
-
-            } catch (Exception e) {
-                e.printStackTrace();
+                try {
+                    inputStream = getContentResolver().openInputStream(selectedImage);
+                    Bitmap image = BitmapFactory.decodeStream(inputStream);
+                    DrawView drawView = (DrawView) findViewById(R.id.draw_view);
+                    drawView.setImageBitmap(image);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+//                DrawView view = findViewById(R.id.draw_view);
+//                Bitmap image = (Bitmap) data.getExtras().get("data");
+//                view.setImageBitmap(image);
             }
         }
+
+//        if (requestCode == REQUEST_GET_PHOTO && resultCode == Activity.RESULT_OK) {
+//            if (data != null) {
+//                ImageView receiptImage = (ImageView) findViewById(R.id.draw_view);
+//
+//                Uri receiptUri = Uri.parse(filename);
+//
+//                try {
+//                    InputStream inputStream = getContentResolver().openInputStream(receiptUri);
+//                    Drawable drawable = Drawable.createFromStream(inputStream, null);
+//                    receiptImage.setImageDrawable(drawable);
+//                } catch (FileNotFoundException e) {
+//                }
+//            }
+//        }
     }
+//                Uri uri = data.getData();
+//                DrawView view = findViewById(R.id.draw_view);
+//                view.setImageUri(uri)
+//            File f = new File(currentPhotoPath);
+//            DrawView view = findViewById(R.id.draw_view);
+    // requestCode == REQUEST_CODE
+//        if (requestCode == RESULT_OK) {
+//            Bitmap image = (Bitmap) data.getExtras().get("data");
+//            paint.setImageBitmap(image);
+//        }
+//        if (data != null) {
+//            Uri selectedImage = data.getData();
+//            ImageView view = findViewById(R.id.draw_view);
+//            view.setImageURI(selectedImage);
+//            Uri selectedImage = data.getData();
+//            InputStream inputStream;
+//
+//            System.out.println("Data: "+ data);
+//            Log.d(TAG, "info");
+//
+//            try {
+//                inputStream = getContentResolver().openInputStream(selectedImage);
+//                Bitmap image = BitmapFactory.decodeStream(inputStream);
+//                DrawView drawView = (DrawView) findViewById(R.id.draw_view);
+//                drawView.setImageBitmap(image);
+//
+//                Log.d(TAG, "Reached!");
+//
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
 
     private void getImageGallery() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivity(intent);
+        if (isGranted) {
+            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            startActivity(intent);
+        } else {
+            askPermission();
+        }
     }
 
     private void askPermission() {
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)
-        + ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        != PackageManager.PERMISSION_GRANTED) { // Permissions are not granted
+                + ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) { // Permissions are not granted
             isGranted = false;
             if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) ||
-            ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 // Create AlertDialog
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle("Grant permission");
@@ -261,7 +294,7 @@ public class MainActivity extends AppCompatActivity implements PassDataInterface
                     public void onClick(DialogInterface dialogInterface, int i) {
                         ActivityCompat.requestPermissions(
                                 MainActivity.this,
-                                new String[] {
+                                new String[]{
                                         Manifest.permission.READ_EXTERNAL_STORAGE,
                                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
                                 },
@@ -275,7 +308,7 @@ public class MainActivity extends AppCompatActivity implements PassDataInterface
             } else {
                 ActivityCompat.requestPermissions(
                         MainActivity.this,
-                        new String[] {
+                        new String[]{
                                 Manifest.permission.READ_EXTERNAL_STORAGE,
                                 Manifest.permission.WRITE_EXTERNAL_STORAGE
                         },
