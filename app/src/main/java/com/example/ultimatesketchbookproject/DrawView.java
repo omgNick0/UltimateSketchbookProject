@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -18,6 +19,7 @@ import java.util.Stack;
 
 public class DrawView extends View {
     private static final float TOUCH_TOLERANCE = 4;
+    private static final String TAG = "DrawView";
 
 
     private float mX, mY;
@@ -99,6 +101,10 @@ public class DrawView extends View {
             paths.add(removedPaths.pop());
             invalidate();
         }
+    }
+
+    public int getStrokeWidth() {
+        return strokeWidth;
     }
 
 
@@ -202,9 +208,68 @@ public class DrawView extends View {
         return true;
     }
 
-    protected void setImageBitmap(Bitmap bitmap) {
-        mCanvas.setBitmap(bitmap);
+    protected void drawBitmap(Bitmap bitmap, float x, float y, Paint paint) { //todo: paint and more
+        Log.d(TAG, "Bitmap: " + bitmap.toString());
+        mCanvas.drawBitmap(bitmap, x, y, mPaint);
+//        mCanvas.drawBitmap(bitmap, new Rect(200, 200, 200), new );
     }
+
+//    @Nullable
+//    @Override
+//    protected Parcelable onSaveInstanceState() {
+//        Parcelable parentState = super.onSaveInstanceState();
+//        SavedState savedState = new SavedState(parentState);
+//        savedState.mBitmap = mBitmap;
+//        savedState.mCanvas = mCanvas;
+//        mCanvas.save();
+//        savedState.mPath = mPath;
+//        savedState.mPaint = mPaint;
+//        return savedState;
+//    }
+//
+//    @Override
+//    protected void onRestoreInstanceState(Parcelable state) {
+//        SavedState savedState = (SavedState) state;
+//        super.onRestoreInstanceState(savedState.getSuperState());
+//        setColor(savedState.currentColor);
+//        setStrokeWidth(savedState.strokeWidth);
+//
+//        mBitmap = savedState.mBitmap;
+//        mCanvas = savedState.mCanvas;
+//        mCanvas.restore();
+//        mPath = savedState.mPath;
+//        mPaint = savedState.mPaint;
+//    }
+
+//    private static class SavedState extends BaseSavedState {
+//        int currentColor;
+//        int strokeWidth;
+//        Path mPath;
+//        Bitmap mBitmap;
+//        Canvas mCanvas;
+//        Paint mPaint;
+//
+//        SavedState(Parcelable superState) {
+//            super(superState);
+//        }
+//
+//        private SavedState(Parcel in) {
+//            super(in);
+//            strokeWidth = in.readInt();
+//            currentColor = in.readInt();
+//        }
+//
+//        public static final Parcelable.Creator<SavedState> CREATOR =
+//                new Parcelable.Creator<SavedState>() {
+//                    public SavedState createFromParcel(Parcel in) {
+//                        return new SavedState(in);
+//                    }
+//
+//                    public SavedState[] newArray (int size) {
+//                        return new SavedState[size];
+//                    }
+//                };
+//    }
 
 
 
