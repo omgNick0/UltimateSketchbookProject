@@ -7,23 +7,17 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-import androidx.annotation.ColorInt;
-import androidx.annotation.NonNull;
-
 import java.util.ArrayList;
 import java.util.Stack;
 
 
-public class DrawView extends View implements Parcelable {
+public class DrawView extends View {
     private static final float TOUCH_TOLERANCE = 4;
-    private static final String TAG = "DrawView";
 
 
     private float mX, mY;
@@ -42,26 +36,12 @@ public class DrawView extends View implements Parcelable {
     private Canvas mCanvas;
     private final Paint mBitmapPaint = new Paint(Paint.DITHER_FLAG);
 
-    private Parcel parcel;
-
 
 
 
     //Constructors to initialise all the attributes
-
     public DrawView(Context context) {
-        super(context);
-    }
-//    public DrawView(Context context) {
-////        this(context, parcel);
-//    }
-
-    public DrawView(Context context, Parcel in) {
-        super(context);
-        if (in != null) {
-            paths = in.readArrayList(Stroke.class.getClassLoader());
-            currentColor = in.readInt();
-        }
+        this(context, null);
     }
 
     public DrawView(Context context, AttributeSet attrs) {
@@ -92,22 +72,11 @@ public class DrawView extends View implements Parcelable {
     }
 
     //sets the current color of stroke
-    public void setColor(@ColorInt int color) {
+    public void setColor(int color) {
         currentColor = color;
     }
-
-    @ColorInt
     public int getColor() {
         return currentColor;
-    }
-
-
-    public ArrayList<Stroke> getPaths() {
-        return paths;
-    }
-
-    public void setPaths(ArrayList<Stroke> paths) {
-        this.paths = paths;
     }
 
     //sets the stroke width
@@ -130,10 +99,6 @@ public class DrawView extends View implements Parcelable {
             paths.add(removedPaths.pop());
             invalidate();
         }
-    }
-
-    public int getStrokeWidth() {
-        return strokeWidth;
     }
 
 
@@ -237,35 +202,9 @@ public class DrawView extends View implements Parcelable {
         return true;
     }
 
-    protected void drawBitmap(Bitmap bitmap, float x, float y, Paint paint) { //todo: paint and more
-        Log.d(TAG, "Bitmap: " + bitmap.toString());
-        mCanvas.drawBitmap(bitmap, x, y, mPaint);
-//        mCanvas.drawBitmap(bitmap, new Rect(200, 200, 200), new );
+    protected void setImageBitmap(Bitmap bitmap) {
+        mCanvas.setBitmap(bitmap);
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeInt(currentColor);
-    }
-
-
-    public static final Creator<DrawView> CREATOR = new Creator<DrawView>() {
-        @Override
-        public DrawView createFromParcel(Parcel in) {
-            return null;
-//            return new DrawView();
-        }
-
-        @Override
-        public DrawView[] newArray(int size) {
-            return new DrawView[size];
-        }
-    };
 
 
 
