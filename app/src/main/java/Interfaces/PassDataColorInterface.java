@@ -1,6 +1,6 @@
 package Interfaces;
 
-public interface PassDataInterface {
+public interface PassDataColorInterface {
     void onDataReceived(String color);
     void onDataReceived (int color);
 }

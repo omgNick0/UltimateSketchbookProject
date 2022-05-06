@@ -3,4 +3,8 @@
     <string name="import_picture">Импортировать картинку</string>
     <string name="export_picture">Экспортировать картинку</string>
     <string name="save_picture">Сохранить картинку</string>
+    <string name="settings">Настройки</string>
+    <string name="add_dec_title_text">Вы хотите добавить заголовок и описание для картинки?</string>
+    <string name="no">Нет, спасибо</string>
+    <string name="yes">Да хочу</string>
 </resources>

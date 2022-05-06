@@ -3,4 +3,11 @@
     <string name="import_picture">Import picture</string>
     <string name="export_picture">Export picture</string>
     <string name="save_picture">Save image</string>
+    <string name="settings">Settings</string>
+    <string name="add_dec_title_text">Do you want to add title and description for your image?</string>
+    <string name="no">No, thank you</string>
+    <string name="yes">Yes i want</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- TODO: Remove or change this placeholder text -->
 </resources>

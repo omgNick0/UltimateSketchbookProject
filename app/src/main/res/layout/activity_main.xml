@@ -76,7 +76,7 @@
             <!--                app:iconTint="#F5FF4B"-->
 
             <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-                android:id="@+id/btn_save"
+                android:id="@+id/btn_gallery"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_gravity="end"
@@ -85,7 +85,7 @@
                 app:backgroundTint="@color/teal_200"
                 app:fabSize="normal"
                 app:iconTint="@color/white"
-                app:icon="@drawable/ic_save"
+                app:icon="@drawable/ic_photo_library"
                 app:iconGravity="top" />
         </LinearLayout>
 

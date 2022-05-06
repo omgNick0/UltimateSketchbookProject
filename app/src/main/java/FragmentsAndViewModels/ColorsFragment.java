@@ -1,4 +1,4 @@
-package Fragments;
+package FragmentsAndViewModels;
 
 import android.annotation.SuppressLint;
 import android.graphics.Color;
@@ -12,27 +12,26 @@ import android.widget.ImageButton;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.fragment.app.DialogFragment;
 
-import com.example.ultimatesketchbookproject.MainActivity;
 import com.example.ultimatesketchbookproject.R;
 
-import Interfaces.PassDataInterface;
+import Interfaces.PassDataColorInterface;
 import top.defaults.colorpicker.ColorPickerPopup;
 
-
 @SuppressLint("ValidFragment")
-public class DialogFragment extends android.app.DialogFragment {
+public class ColorsFragment extends DialogFragment {
 
     /**
      * Based color from other fragment is taking, but the initial color number / color is wrong
      */
 
-    private static final String TAG = "DialogFragment";
-    private PassDataInterface passDataInterface;
+    private static final String TAG = "ColorsFragment";
+    private PassDataColorInterface passDataColorInterface;
     private ImageButton base_1, base_2, base_3, base_4, base_5, color_pic;
 
-    public DialogFragment(PassDataInterface passDataInterface) {
-        this.passDataInterface = passDataInterface;
+    public ColorsFragment(PassDataColorInterface passDataColorInterface) {
+        this.passDataColorInterface = passDataColorInterface;
     }
 
     @Nullable
@@ -76,7 +75,7 @@ public class DialogFragment extends android.app.DialogFragment {
                         .show(view, new ColorPickerPopup.ColorPickerObserver() {
                             @Override
                             public void onColorPicked(int color) {
-                                passDataInterface.onDataReceived(color);
+                                passDataColorInterface.onDataReceived(color);
                             }
                         });
             }
@@ -87,7 +86,7 @@ public class DialogFragment extends android.app.DialogFragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                passDataInterface.onDataReceived(color);
+                passDataColorInterface.onDataReceived(color);
                 Log.d(TAG, "Received!");
             }
         });

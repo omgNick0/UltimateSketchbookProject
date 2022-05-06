@@ -2,6 +2,14 @@ package com.example.ultimatesketchbookproject;
 
 import android.graphics.Path;
 
+
+/**
+ * Write
+ * something later
+ * <code>int y = 0</code>
+ * Here
+ */
+
 public class Stroke {
 
     //color of the stroke
