@@ -1,4 +1,4 @@
-package FragmentsAndViewModels;
+package Fragments;
 
 import android.annotation.SuppressLint;
 import android.graphics.Color;

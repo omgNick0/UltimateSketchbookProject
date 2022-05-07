@@ -31,6 +31,7 @@
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/layout/fragment_get_data.xml" value="0.246875" />
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/layout/fragment_home.xml" value="0.27395833333333336" />
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/layout/fragment_notifications.xml" value="0.27395833333333336" />
+        <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/layout/fragment_stroke.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/layout/layout.xml" value="0.27395833333333336" />
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/layout/stroke_fragment.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/layout/test_activity.xml" value="0.14" />
@@ -43,7 +44,7 @@
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_16_PREVIEW" project-jdk-name="Android API 32 Platform" project-jdk-type="Android SDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_16" project-jdk-name="Android API 32 Platform" project-jdk-type="Android SDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

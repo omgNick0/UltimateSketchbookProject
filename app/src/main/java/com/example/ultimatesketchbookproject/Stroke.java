@@ -4,10 +4,8 @@ import android.graphics.Path;
 
 
 /**
- * Write
- * something later
- * <code>int y = 0</code>
- * Here
+ * This class needs for making paths and strokes objects, which will be displayed on the users UI
+ * screen.
  */
 
 public class Stroke {

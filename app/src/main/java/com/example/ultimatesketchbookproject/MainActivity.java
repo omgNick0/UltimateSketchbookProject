@@ -2,6 +2,7 @@ package com.example.ultimatesketchbookproject;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,11 +12,11 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
+import android.os.HandlerThread;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
@@ -23,6 +24,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -37,6 +39,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.slider.RangeSlider;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -46,8 +49,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-import FragmentsAndViewModels.ColorsFragment;
-import FragmentsAndViewModels.StrokeViewModel;
+import Fragments.ColorsFragment;
+import ViewModels.StrokeViewModel;
 import Interfaces.PassDataColorInterface;
 
 
@@ -59,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
     //creating objects of type button
 
     private ExtendedFloatingActionButton gallery, colorPicker, stroke, instruments; // 4th btn to open chat with other users
+    private RelativeLayout layout;
 
     //creating a RangeSlider object, which will
     // help in selecting the width of the Stroke
@@ -75,58 +79,23 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
 
     private StrokeViewModel strokeViewModel;
 
+    private Handler mUiHandler = new Handler();
+    private SaveThread mWorkerThread;
 
-//    private MainState state;
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_activity_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.undo:
-                drawView.undo();
-                return true;
-            case R.id.redo:
-                drawView.redo();
-                return true;
-//            case R.id.item3:
-//                Toast.makeText(this, "Item 3 selected", Toast.LENGTH_SHORT).show();
-//                return true;
-            case R.id.import_image:
-                getImageGallery();
-//                Intent intent = new Intent();
-//                intent.setType("image/*");
-//                intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-//                startActivity(Intent.createChooser(intent, "Tack Image"));
-//                dispatchTakePictureIntent();
-                return true;
-            case R.id.export_image:
-                Toast.makeText(this, R.string.export_picture, Toast.LENGTH_SHORT).show();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
+    public static boolean ACTIVITY_STATE = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+//        ActivityCompat.requestPermissions(this,
+//                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+//
 
-//        addDescAndTitle();
-
-//        state = StateManager.getState(this, new MainState());
-
-        someActivityResultLauncher = registerForActivityResult(
+        someActivityResultLauncher = registerForActivityResult( // todo: need to draw on selected image from gallery
+                // todo: as a solution - make method in DrawView, which will clear all paths of strokes in ArrayList and clear canvas
+                // todo: but how draw on it...
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == Activity.RESULT_OK) {
@@ -140,8 +109,10 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
                             try {
                                 inputStream = getContentResolver().openInputStream(selectedImage);
                                 Bitmap image = BitmapFactory.decodeStream(inputStream);
-                                DrawView view = (DrawView) findViewById(R.id.draw_view);
-                                view.drawBitmap(image, 0, 0, new Paint());
+                                Log.d(TAG, image + " ");
+                                Log.d(TAG, drawView + " ");
+                                Uri imageUri = drawView.getImageUri(this, image);
+                                drawView.setImageUri(imageUri); // can be selectedImage value in here
                             } catch (FileNotFoundException e) {
                                 e.printStackTrace();
                             }
@@ -149,17 +120,7 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
                     }
                 });
 
-
-//        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault());
-//        String date = format.format(new Date());
-////        filename = path + "/" + date + ".png";
-//        try {
-//            path.mkdirs();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-        //getting the reference of the views from their ids
-
+        layout = findViewById(R.id.main_layout);
         drawView = (DrawView) findViewById(R.id.draw_view);
         rangeSlider = (RangeSlider) findViewById(R.id.rangebar);
         gallery = (ExtendedFloatingActionButton) findViewById(R.id.btn_gallery);
@@ -210,8 +171,14 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
             @Override
             public void onClick(View view) {
                 try {
-                    askPermission();
-                    saveImage();
+                    Snackbar snackbar = Snackbar.make(layout, "gallery opened. Wow!", Snackbar.LENGTH_SHORT);
+                    snackbar.setAction("dismiss", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            snackbar.dismiss();
+                        }
+                    });
+                    snackbar.show();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -232,6 +199,7 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
         //set the range of the RangeSlider
         rangeSlider.setValueFrom(0.0f);
         rangeSlider.setValueTo(100.0f);
+
         //adding a OnChangeListener which will change the stroke width
         //as soon as the user slides the slider
         rangeSlider.addOnChangeListener(new RangeSlider.OnChangeListener() {
@@ -256,19 +224,61 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
 
         Integer color = strokeViewModel.getColor().getValue();
 
-        if (color == null) {
+        if (color == null && savedInstanceState != null) {
+            ACTIVITY_STATE = true;
             strokeViewModel.setColor(drawView.getColor());
+            drawView.setColor(savedInstanceState.getInt("color"));
         }
 
-        //          -> Then application starts not for the first time
 //        if (savedInstanceState != null) {
 //            drawView.setStrokeWidth(savedInstanceState.getInt("stroke_width"));
 //        }
-
+//
 //        if (state.strokeWidth != 0) {
 //            drawView.setStrokeWidth(state.strokeWidth);
 //        }
 
+    }
+
+    private void openSocialNetworks() {
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, "Приложение name, скачивай от сюда - ссылка");
+        sendIntent.setType("text/plain");
+        startActivity(Intent.createChooser(sendIntent,"Поделиться"));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_activity_menu, menu);
+        return true;
+    }
+
+    @SuppressLint("NonConstantResourceId")
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.undo:
+                drawView.undo();
+                return true;
+            case R.id.redo:
+                drawView.redo();
+                return true;
+            case R.id.save_image:
+                askPermission();
+                saveImage();
+                return true;
+            case R.id.import_image:
+                getImageGallery();
+                return true;
+            case R.id.export_image:
+                openSocialNetworks();
+                Toast.makeText(this, R.string.export_picture, Toast.LENGTH_SHORT).show();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void getImageGallery() {
@@ -278,7 +288,7 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
         } else {
             askPermission();
         }
-    } // todo: github - functions - latest version of project
+    }
 
     private void askPermission() {
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -321,69 +331,99 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
             isGranted = true;
             Log.d(TAG, "Permission for reading and writing granted");
         }
-
     }
 
-    // TODO write new Thread - class extends Thread or implements Runnable
 
-    class MyThread extends Thread {
+    /**
+     * private class, which will run in new Thread, using Runnable and which can send UI messages
+     * to the user in the main Thread, using Loop and addressing to Message queue
+     */
+    private class SaveThread extends HandlerThread {
+        private Handler workerHandler;
 
-        private Handler handler;
+        SaveThread(String name) {
+            super(name);
+        }
 
-        @Override
-        public void run() {
-            File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "DemoPicture.jpg");
-            Bitmap bitmap = drawView.save();
-            // insert our picture to gallery
-            MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "", "");
-            if (drawView.hasPaths() && isGranted) {
-//             TODO Here we make alert dialog
-//                DescriptionAndTitleFragment desc = new DescriptionAndTitleFragment();
-//                desc.show(getFragmentManager(), TAG); // TODO приостановить работу приложения до выбора пользователя
-                try {
-                    // code, which turns View to a byte and writes it to an image
-                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 0, bos);
-                    byte[] bitmapData = bos.toByteArray();
-                    FileOutputStream fos = new FileOutputStream(file);
-                    fos.write(bitmapData);
-                    fos.flush();
-                    fos.close();
+        public void postTask(Runnable task) {
+            workerHandler.post(task);
+        }
 
-                    Looper.prepare();
-                    handler = new Handler(Looper.getMainLooper()) {
-                        public void handleMessage(Message msg) {
-                            Toast.makeText(MainActivity.this, "Saved", Toast.LENGTH_SHORT).show();
-                        }
-                    };
-                    Looper.loop();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                    Toast.makeText(MainActivity.this, "File was not found!", Toast.LENGTH_SHORT).show();
-                } catch (IOException e) {
-//                 Unable to create file, likely because external storage is
-//                 not currently mounted.
-                    Log.w("ExternalStorage", "Error writing " + file, e);
-                } catch (NullPointerException e) {
-                    e.printStackTrace();
-                    Toast.makeText(MainActivity.this, "Nothing to save", Toast.LENGTH_SHORT).show();
-                } catch (
-                        Exception e) {
-                    e.printStackTrace();
-                    Toast.makeText(MainActivity.this, "Another Error occurred!", Toast.LENGTH_SHORT).show();
-                }
-            } else
-                Toast.makeText(getApplicationContext(), "Your painting is empty or you didn't grant a permission!", Toast.LENGTH_SHORT).show();
+        public void prepareHandler() {
+            workerHandler = new Handler(getLooper());
         }
     }
+
 
     /**
      * This function provides user to save image on external storage, so it will be private, but also
      * it saves image go a gallery, so every app can get it and it will be public
+     * Image saving in another thread, in a way not to make main thread too heavy
      */
-    private void saveImage() { //TODO another thread
-        MyThread thread = new MyThread();
-        thread.start();
+    private void saveImage() {
+        mWorkerThread = new SaveThread("myWorkerThread");
+        Runnable task = new Runnable() {
+            @Override
+            public void run() {
+                if (drawView.hasPaths() && isGranted) {
+                    File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "DemoPicture.jpg");
+                    Bitmap bitmap = drawView.save();
+                    try {
+                        // code, which turns View to a byte and writes it to an image
+                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 0, bos);
+                        byte[] bitmapData = bos.toByteArray();
+                        FileOutputStream fos = new FileOutputStream(file);
+                        fos.write(bitmapData);
+                        fos.flush();
+                        fos.close();
+                        // insert our picture to gallery
+                        MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "", "");
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                        Toast.makeText(MainActivity.this, "File was not found!", Toast.LENGTH_SHORT).show();
+                    } catch (IOException e) {
+//                 Unable to create file, likely because external storage is
+//                 not currently mounted.
+                        Log.w("ExternalStorage", "Error writing " + file, e);
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
+                        Toast.makeText(MainActivity.this, "Nothing to save", Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Toast.makeText(MainActivity.this, "Another Error occurred!", Toast.LENGTH_SHORT).show();
+                    }
+
+
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    mUiHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Snackbar snackbar = Snackbar.make(layout, "Image saved!", Snackbar.LENGTH_SHORT);
+                            snackbar.setAction("OK", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    snackbar.dismiss();
+                                }
+                            });
+                            snackbar.show();
+                        }
+                    });
+
+
+                } else {
+                    Toast.makeText(getApplicationContext(), "Your painting is empty or you didn't grant a permission!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+        mWorkerThread.start();
+        mWorkerThread.prepareHandler();
+        mWorkerThread.postTask(task);
     }
 
     @Override
@@ -402,6 +442,8 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
+        outState.putInt("color", drawView.getColor());
+
         // TODO put value from Fragment in here
 //        outState.putString("key", );
 
@@ -414,18 +456,21 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
+
+        savedInstanceState.getInt("color");
 //        drawView.setStrokeWidth(state.strokeWidth);
 //        int width = savedInstanceState.getInt("stroke_width", drawView.getStrokeWidth());
 //        drawView.setStrokeWidth(width);
 //        drawView.setColor(savedInstanceState.getInt("color"));
     }
 
-
+    // set values
     @Override
     protected void onResume() {
         super.onResume();
         ArrayList<Stroke> data = strokeViewModel.getLines().getValue();
         Integer color = strokeViewModel.getColor().getValue();
+
         if (data != null) {
             drawView.setPaths(data);
         }
@@ -436,7 +481,7 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
 
     }
 
-
+    // Get values
     @Override
     protected void onPause() {
         super.onPause();

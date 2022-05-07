@@ -1,4 +1,4 @@
-package FragmentsAndViewModels;
+package Fragments;
 
 import androidx.lifecycle.ViewModelProvider;
 
@@ -14,9 +14,9 @@ import android.view.ViewGroup;
 
 import com.example.ultimatesketchbookproject.R;
 
-public class StrokeFragment extends Fragment {
+import ViewModels.StrokeViewModel;
 
-    private StrokeViewModel mViewModel;
+public class StrokeFragment extends Fragment {
 
     public static StrokeFragment newInstance() {
         return new StrokeFragment();
@@ -25,7 +25,7 @@ public class StrokeFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        mViewModel = new ViewModelProvider(requireActivity()).get(StrokeViewModel.class);
+        StrokeViewModel mViewModel = new ViewModelProvider(requireActivity()).get(StrokeViewModel.class);
         return inflater.inflate(R.layout.fragment_stroke, container, false);
     }
 

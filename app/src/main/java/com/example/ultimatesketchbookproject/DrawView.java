@@ -7,18 +7,24 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Stack;
 
 
 public class DrawView extends View {
-    private static final float TOUCH_TOLERANCE = 4;
 
+    private static final float TOUCH_TOLERANCE = 4;
+    private static final String TAG = "DrawView";
 
     private float mX, mY;
     private Paint mPaint;
@@ -56,7 +62,6 @@ public class DrawView extends View {
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         //0xff=255 in decimal
         mPaint.setAlpha(0xff);
-//        init(getWidth(), getHeight()); // what is that
     }
 
     //this method instantiate the bitmap and object
@@ -64,11 +69,12 @@ public class DrawView extends View {
 
         mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
-
-        //set an initial color of the brush
-        currentColor = Color.GREEN;
-        //set an initial brush size
-        strokeWidth = 20;
+        if (!MainActivity.ACTIVITY_STATE) {
+            //set an initial color of the brush
+            currentColor = Color.RED;
+            //set an initial brush size
+            strokeWidth = 20;
+        }
     }
 
     //sets the current color of stroke
@@ -82,6 +88,14 @@ public class DrawView extends View {
     //sets the stroke width
     public void setStrokeWidth(int width) {
         strokeWidth = width;
+    }
+
+    public ArrayList<Stroke> getPaths() {
+        return paths;
+    }
+
+    public void setPaths(ArrayList<Stroke> paths) {
+        this.paths = paths;
     }
 
     public void undo() {
@@ -131,7 +145,8 @@ public class DrawView extends View {
 
             mCanvas.drawPath(fp.path, mPaint);
         }
-        canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
+//        canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
+        canvas.drawBitmap(mBitmap, 0, 0, null);
         canvas.restore();
     }
 
@@ -151,6 +166,35 @@ public class DrawView extends View {
         mX = x;
         mY = y;
     }
+
+    protected void setImageUri(Uri uri) {
+        try {
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), uri);
+            float aspecRatio = (float) bitmap.getHeight() / (float) bitmap.getWidth();
+            DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+            int mImageWidth = displayMetrics.widthPixels;
+            int mImageHeight = Math.round(mImageWidth * aspecRatio);
+            mBitmap = Bitmap.createScaledBitmap(bitmap, mImageWidth, mImageHeight, false);
+            invalidate();
+            requestLayout();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected void drawBitmap(Bitmap bitmap, float x, float y, Paint paint) { //todo: paint and more
+        Log.d(TAG, "Bitmap: " + bitmap.toString());
+        mCanvas.drawBitmap(bitmap, x, y, mPaint);
+//        mCanvas.drawBitmap(bitmap, new Rect(200, 200, 200), new );
+    }
+
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
+
 
     //in this method we check if the move of finger on the
     // screen is greater than the Tolerance we have previously defined,
@@ -205,9 +249,6 @@ public class DrawView extends View {
     protected void setImageBitmap(Bitmap bitmap) {
         mCanvas.setBitmap(bitmap);
     }
-
-
-
 
 
 
