@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.AttributeSet;
@@ -62,6 +63,7 @@ public class DrawView extends View {
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         //0xff=255 in decimal
         mPaint.setAlpha(0xff);
+        Log.d(TAG, "DrawView created");
     }
 
     //this method instantiate the bitmap and object
@@ -69,12 +71,11 @@ public class DrawView extends View {
 
         mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
-        if (!MainActivity.ACTIVITY_STATE) {
-            //set an initial color of the brush
-            currentColor = Color.RED;
-            //set an initial brush size
-            strokeWidth = 20;
-        }
+
+        //set an initial color of the brush
+        currentColor = Color.RED;
+        //set an initial brush size
+        strokeWidth = 20;
     }
 
     //sets the current color of stroke
@@ -96,6 +97,12 @@ public class DrawView extends View {
 
     public void setPaths(ArrayList<Stroke> paths) {
         this.paths = paths;
+    }
+
+    public void makeNewPainting() {
+        mCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+        paths.clear();
+        removedPaths.clear();
     }
 
     public void undo() {

@@ -7,7 +7,7 @@
     <string name="add_dec_title_text">Do you want to add title and description for your image?</string>
     <string name="no">No, thank you</string>
     <string name="yes">Yes i want</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <!-- TODO: Remove or change this placeholder text -->
+    <string name="cancel">Cancel</string>
+    <string name="new_painting_title">New Painting</string>
+    <string name="new_painting_desc">Are you sure you want to make a new painting?(You won\'t save the current)</string>
 </resources>

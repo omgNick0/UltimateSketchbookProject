@@ -37,7 +37,9 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.slider.RangeSlider;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -47,7 +49,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 import Fragments.ColorsFragment;
 import ViewModels.StrokeViewModel;
@@ -61,7 +66,8 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
     private DrawView drawView;
     //creating objects of type button
 
-    private ExtendedFloatingActionButton gallery, colorPicker, stroke, instruments; // 4th btn to open chat with other users
+//    private ExtendedFloatingActionButton gallery, colorPicker, stroke, instruments; // 4th btn to open chat with other users
+    private BottomNavigationView navigationView;
     private RelativeLayout layout;
 
     //creating a RangeSlider object, which will
@@ -79,10 +85,8 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
 
     private StrokeViewModel strokeViewModel;
 
-    private Handler mUiHandler = new Handler();
-    private SaveThread mWorkerThread;
+    private final Handler mUiHandler = new Handler();
 
-    public static boolean ACTIVITY_STATE = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,29 +124,37 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
                     }
                 });
 
+        navigationView = findViewById(R.id.bottom_navigation_menu);
+
+        navigationView.setOnItemSelectedListener(item -> {
+
+            switch (item.getItemId()){
+                case R.id.btn_new_painting:
+                    makeNewPainting();
+                    break;
+                case R.id.btn_stroke:
+                    if (rangeSlider.getVisibility() == View.VISIBLE)
+                        rangeSlider.setVisibility(View.GONE);
+                    else
+                        rangeSlider.setVisibility(View.VISIBLE);
+                    break;
+                case R.id.btn_color:
+                    ColorsFragment fragment = new ColorsFragment(MainActivity.this);
+                    fragment.show(getSupportFragmentManager(), TAG);
+                    break;
+                case R.id.btn_gallery:
+                    startActivity(new Intent(MainActivity.this, GalleryActivity.class));
+                    break;
+            }
+
+            return true;
+        });
+
         layout = findViewById(R.id.main_layout);
         drawView = (DrawView) findViewById(R.id.draw_view);
         rangeSlider = (RangeSlider) findViewById(R.id.rangebar);
-        gallery = (ExtendedFloatingActionButton) findViewById(R.id.btn_gallery);
-        colorPicker = (ExtendedFloatingActionButton) findViewById(R.id.btn_color);
-        stroke = (ExtendedFloatingActionButton) findViewById(R.id.btn_stroke);
-        instruments = (ExtendedFloatingActionButton) findViewById(R.id.btn_instruments);
 
         strokeViewModel = new ViewModelProvider((this)).get(StrokeViewModel.class);
-
-        strokeViewModel.getLines().observe(this, new Observer<ArrayList<Stroke>>() {
-            @Override
-            public void onChanged(ArrayList<Stroke> strokes) {
-
-            }
-        });
-
-        strokeViewModel.getColor().observe(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-
-            }
-        });
 
 //        Integer color = strokeViewModel.getColor().getValue();
 //
@@ -159,56 +171,13 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
         //in form of PNG, in the storage
 
 
-        colorPicker.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ColorsFragment fragment = new ColorsFragment(MainActivity.this);
-                fragment.show(getSupportFragmentManager(), TAG);
-            }
-        });
-
-        gallery.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    Snackbar snackbar = Snackbar.make(layout, "gallery opened. Wow!", Snackbar.LENGTH_SHORT);
-                    snackbar.setAction("dismiss", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            snackbar.dismiss();
-                        }
-                    });
-                    snackbar.show();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        // the button will toggle the visibility of the RangeBar/RangeSlider
-        stroke.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (rangeSlider.getVisibility() == View.VISIBLE)
-                    rangeSlider.setVisibility(View.GONE);
-                else
-                    rangeSlider.setVisibility(View.VISIBLE);
-            }
-        });
-
         //set the range of the RangeSlider
         rangeSlider.setValueFrom(0.0f);
         rangeSlider.setValueTo(100.0f);
 
         //adding a OnChangeListener which will change the stroke width
         //as soon as the user slides the slider
-        rangeSlider.addOnChangeListener(new RangeSlider.OnChangeListener() {
-            @SuppressLint("RestrictedApi")
-            @Override
-            public void onValueChange(@NonNull RangeSlider slider, float value, boolean fromUser) {
-                drawView.setStrokeWidth((int) value);
-            }
-        });
+        rangeSlider.addOnChangeListener((slider, value, fromUser) -> drawView.setStrokeWidth((int) value));
 
         //pass the height and width of the custom view to the init method of the DrawView object
         ViewTreeObserver vto = drawView.getViewTreeObserver();
@@ -224,11 +193,11 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
 
         Integer color = strokeViewModel.getColor().getValue();
 
-        if (color == null && savedInstanceState != null) {
-            ACTIVITY_STATE = true;
-            strokeViewModel.setColor(drawView.getColor());
-            drawView.setColor(savedInstanceState.getInt("color"));
-        }
+//        if (color == null && savedInstanceState != null) {
+//            ACTIVITY_STATE = true;
+//            strokeViewModel.setColor(drawView.getColor());
+//            drawView.setColor(savedInstanceState.getInt("color"));
+//        }
 
 //        if (savedInstanceState != null) {
 //            drawView.setStrokeWidth(savedInstanceState.getInt("stroke_width"));
@@ -255,7 +224,6 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
         return true;
     }
 
-    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
@@ -279,6 +247,21 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void makeNewPainting() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle(R.string.new_painting_title);
+        builder.setMessage(R.string.new_painting_desc);
+        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                drawView.makeNewPainting();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, null);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     private void getImageGallery() {
@@ -338,7 +321,7 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
      * private class, which will run in new Thread, using Runnable and which can send UI messages
      * to the user in the main Thread, using Loop and addressing to Message queue
      */
-    private class SaveThread extends HandlerThread {
+    private static class SaveThread extends HandlerThread {
         private Handler workerHandler;
 
         SaveThread(String name) {
@@ -361,12 +344,16 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
      * Image saving in another thread, in a way not to make main thread too heavy
      */
     private void saveImage() {
-        mWorkerThread = new SaveThread("myWorkerThread");
+        SaveThread mWorkerThread = new SaveThread("myWorkerThread");
         Runnable task = new Runnable() {
             @Override
             public void run() {
                 if (drawView.hasPaths() && isGranted) {
-                    File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "DemoPicture.jpg");
+
+                    SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault());
+                    String date = format.format(new Date());
+                    String filename = date + ".jpg";
+                    File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), filename);
                     Bitmap bitmap = drawView.save();
                     try {
                         // code, which turns View to a byte and writes it to an image
@@ -417,7 +404,14 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
 
 
                 } else {
-                    Toast.makeText(getApplicationContext(), "Your painting is empty or you didn't grant a permission!", Toast.LENGTH_SHORT).show();
+                    Snackbar snackbar = Snackbar.make(layout, "Your painting is empty or you didn't grant a permission!", Snackbar.LENGTH_SHORT);
+                    snackbar.setAction("give", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            askPermission();
+                        }
+                    });
+                    snackbar.show();
                 }
             }
         };
@@ -429,13 +423,13 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
     @Override
     public void onDataReceived(String color) {
         drawView.setColor(Color.parseColor(color));
-        colorPicker.setBackgroundColor(Color.parseColor(color));
+//        colorPicker.setBackgroundColor(Color.parseColor(color));
     }
 
     @Override
     public void onDataReceived(int color) {
         drawView.setColor(color);
-        colorPicker.setBackgroundColor(color);
+//        colorPicker.setBackgroundColor(color);
     }
 
     @Override // What is wrong with all this ?????
@@ -474,6 +468,7 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
         if (data != null) {
             drawView.setPaths(data);
         }
+        Log.d(TAG, "Resumed");
 
 //        if (color != null) {
 //            drawView.setColor(color);

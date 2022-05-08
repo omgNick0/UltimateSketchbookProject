@@ -7,4 +7,7 @@
     <string name="add_dec_title_text">Вы хотите добавить заголовок и описание для картинки?</string>
     <string name="no">Нет, спасибо</string>
     <string name="yes">Да хочу</string>
+    <string name="cancel">Отмена</string>
+    <string name="new_painting_title">Новый рисунок</string>
+    <string name="new_painting_desc">Вы уверены что вы хотите создать новый рисунок?(Вы не сохраните текущий)</string>
 </resources>

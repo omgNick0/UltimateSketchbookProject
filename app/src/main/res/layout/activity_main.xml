@@ -29,7 +29,6 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="0dp"
             android:layout_marginBottom="0dp"
-            android:outlineSpotShadowColor="@color/teal_200"
             android:visibility="gone" />
 
         <LinearLayout
@@ -38,56 +37,12 @@
             android:layout_gravity="center"
             android:orientation="horizontal">
 
-            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-                android:id="@+id/btn_instruments"
-                android:layout_width="wrap_content"
-                android:layout_weight="1"
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/bottom_navigation_menu"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                app:icon="@drawable/ic_instruments"
-                app:iconGravity="top"
-                app:iconTint="@color/white"
-                app:backgroundTint="@color/teal_200"
-                app:fabSize="normal" />
+                app:menu="@menu/main_activity_bottom_menu"/>
 
-            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-                android:id="@+id/btn_stroke"
-                android:layout_width="wrap_content"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                app:icon="@drawable/ic_brush"
-                app:iconGravity="top"
-                app:iconTint="@color/ic_brush_color"
-                app:backgroundTint="@color/teal_200"
-                app:fabSize="normal" />
-
-
-            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-                android:id="@+id/btn_color"
-                android:layout_width="wrap_content"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                app:icon="@drawable/ic_colorpicker"
-                app:iconGravity="top"
-                app:iconTint="@color/white"
-                app:backgroundTint="@color/teal_200"
-                app:fabSize="normal" />
-            <!--                app:iconTint="#F5FF4B"-->
-
-            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-                android:id="@+id/btn_gallery"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="end"
-                android:layout_weight="1"
-                android:shadowColor="@color/white"
-                app:backgroundTint="@color/teal_200"
-                app:fabSize="normal"
-                app:iconTint="@color/white"
-                app:icon="@drawable/ic_photo_library"
-                app:iconGravity="top" />
         </LinearLayout>
 
         <LinearLayout
