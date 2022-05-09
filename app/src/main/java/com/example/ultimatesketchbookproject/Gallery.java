@@ -1,15 +1,17 @@
 package com.example.ultimatesketchbookproject;
 
 
+import android.graphics.Bitmap;
+
 public class Gallery {
     private String name;
     private String date;
-    private int resourceId;
+    private Bitmap bitmap_image;
 
-    public Gallery(String name, String date, int file) {
+    public Gallery(String name, String date, Bitmap bitmap) {
         this.name = name;
         this.date = date;
-        this.resourceId = resourceId;
+        this.bitmap_image = bitmap;
     }
 
     public String getName() {
@@ -28,11 +30,11 @@ public class Gallery {
         this.date = date;
     }
 
-    public int getResourceId() {
-        return resourceId;
+    public Bitmap getBitmap_image() {
+        return bitmap_image;
     }
 
-    public void setResourceId(int resourceId) {
-        this.resourceId = resourceId;
+    public void setBitmap_image(Bitmap bitmap) {
+        this.bitmap_image = bitmap;
     }
 }

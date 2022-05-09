@@ -15,10 +15,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.UltimateSketchbookProject">
         <activity
-            android:name=".GalleryActivity"
+            android:name="com.example.ultimatesketchbookproject.GalleryActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name="com.example.ultimatesketchbookproject.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

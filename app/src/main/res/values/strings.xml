@@ -10,4 +10,10 @@
     <string name="cancel">Cancel</string>
     <string name="new_painting_title">New Painting</string>
     <string name="new_painting_desc">Are you sure you want to make a new painting?(You won\'t save the current)</string>
+    <string name="save_title">Enter name of your picture</string>
+    <string name="ok">OK</string>
+    <string name="no_permission">Your painting is empty or you didn\'t grant a permission!</string>
+    <string name="grant_permission_title">Grant permission</string>
+    <string name="grant_permission_message">If you want to save your drawings, you need to grant permission</string>
+    <string name="gallery_title" translatable="false">GALLERY</string>
 </resources>

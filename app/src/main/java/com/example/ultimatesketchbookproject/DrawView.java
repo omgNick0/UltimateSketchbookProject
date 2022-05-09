@@ -184,6 +184,7 @@ public class DrawView extends View {
             mBitmap = Bitmap.createScaledBitmap(bitmap, mImageWidth, mImageHeight, false);
             invalidate();
             requestLayout();
+            mCanvas.drawBitmap(mBitmap, mImageWidth, mImageHeight, null);
         } catch (IOException e) {
             e.printStackTrace();
         }

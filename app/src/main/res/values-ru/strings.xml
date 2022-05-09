@@ -10,4 +10,9 @@
     <string name="cancel">Отмена</string>
     <string name="new_painting_title">Новый рисунок</string>
     <string name="new_painting_desc">Вы уверены что вы хотите создать новый рисунок?(Вы не сохраните текущий)</string>
+    <string name="save_title">Введите название рисунка</string>
+    <string name="ok">ОК</string>
+    <string name="no_permission">Ваш рисунок пустой или вы не дали доступ к памяти!</string>
+    <string name="grant_permission_title">Предоставить разрешение</string>
+    <string name="grant_permission_message">Если Вы хотите сохранить рисунок, вы выдолжны дать разрешение</string>
 </resources>

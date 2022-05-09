@@ -35,7 +35,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Gallery state = gallery.get(position);
-        holder.imageView.setImageResource(state.getResourceId());
+        holder.imageView.setImageBitmap(state.getBitmap_image());
         holder.nameView.setText(state.getName());
         holder.dateView.setText(state.getDate());
     }

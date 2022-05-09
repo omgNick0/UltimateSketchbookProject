@@ -1,8 +1,6 @@
 package com.example.ultimatesketchbookproject;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,20 +8,20 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.provider.MediaStore;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -34,12 +32,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
-import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.slider.RangeSlider;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -78,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
     private boolean isGranted = false;
 
     private static final String TAG = "MainActivity";
+    private static final String INSERT_IMAGE = "InsertImage";
 
 //    private static final int REQUEST_GET_PHOTO = 1;
 
@@ -100,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
         someActivityResultLauncher = registerForActivityResult( // todo: need to draw on selected image from gallery
                 // todo: as a solution - make method in DrawView, which will clear all paths of strokes in ArrayList and clear canvas
                 // todo: but how draw on it...
+                // todo: возможно проблема в том что вызывается только в методе onCreate, соответственно DrawView не получается никакой информации
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == Activity.RESULT_OK) {
@@ -116,6 +113,7 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
                                 Log.d(TAG, image + " ");
                                 Log.d(TAG, drawView + " ");
                                 Uri imageUri = drawView.getImageUri(this, image);
+                                Log.d(INSERT_IMAGE, "Image inserted");
                                 drawView.setImageUri(imageUri); // can be selectedImage value in here
                             } catch (FileNotFoundException e) {
                                 e.printStackTrace();
@@ -146,7 +144,6 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
                     startActivity(new Intent(MainActivity.this, GalleryActivity.class));
                     break;
             }
-
             return true;
         });
 
@@ -193,16 +190,15 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
 
         Integer color = strokeViewModel.getColor().getValue();
 
-//        if (color == null && savedInstanceState != null) {
-//            ACTIVITY_STATE = true;
-//            strokeViewModel.setColor(drawView.getColor());
-//            drawView.setColor(savedInstanceState.getInt("color"));
-//        }
+        if (color == null && savedInstanceState != null) {
+            strokeViewModel.setColor(drawView.getColor());
+            drawView.setColor(savedInstanceState.getInt("color"));
+        }
 
-//        if (savedInstanceState != null) {
-//            drawView.setStrokeWidth(savedInstanceState.getInt("stroke_width"));
-//        }
-//
+        if (savedInstanceState != null) {
+            drawView.setStrokeWidth(savedInstanceState.getInt("stroke_width"));
+        }
+
 //        if (state.strokeWidth != 0) {
 //            drawView.setStrokeWidth(state.strokeWidth);
 //        }
@@ -273,6 +269,36 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
         }
     }
 
+    private String enterImageName() { // todo: change function
+        final String[] name = {""};
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.save_title);
+
+// Set up the input
+        final EditText input = new EditText(this);
+// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+
+// Set up the buttons
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                name[0] = input.getText().toString();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+
+        return name[0];
+    }
+
     private void askPermission() {
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)
                 + ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -282,9 +308,9 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
                     ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 // Create AlertDialog
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("Grant permission");
-                builder.setMessage("If you want to save your drawings, you need to grant permission");
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                builder.setTitle(R.string.grant_permission_title);
+                builder.setMessage(R.string.grant_permission_message);
+                builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         ActivityCompat.requestPermissions(
@@ -297,7 +323,7 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
                         );
                     }
                 });
-                builder.setNegativeButton("Cancel", null);
+                builder.setNegativeButton(R.string.cancel, null);
                 AlertDialog alertDialog = builder.create();
                 alertDialog.show();
             } else {
@@ -344,15 +370,15 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
      * Image saving in another thread, in a way not to make main thread too heavy
      */
     private void saveImage() {
-        SaveThread mWorkerThread = new SaveThread("myWorkerThread");
+        SaveThread mWorkerThread = new SaveThread("Saver");
         Runnable task = new Runnable() {
             @Override
             public void run() {
                 if (drawView.hasPaths() && isGranted) {
-
                     SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault());
                     String date = format.format(new Date());
                     String filename = date + ".jpg";
+//                    String filename = enterImageName() + ".jpg";
                     File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), filename);
                     Bitmap bitmap = drawView.save();
                     try {
@@ -404,8 +430,8 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
 
 
                 } else {
-                    Snackbar snackbar = Snackbar.make(layout, "Your painting is empty or you didn't grant a permission!", Snackbar.LENGTH_SHORT);
-                    snackbar.setAction("give", new View.OnClickListener() {
+                    Snackbar snackbar = Snackbar.make(layout, R.string.no_permission, Snackbar.LENGTH_SHORT);
+                    snackbar.setAction(R.string.ok, new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             askPermission();
