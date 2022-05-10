@@ -32,6 +32,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -44,6 +45,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Time;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -55,6 +58,7 @@ import Interfaces.PassDataColorInterface;
 
 
 public class MainActivity extends AppCompatActivity implements PassDataColorInterface {
+    // todo: import image on drawing + server + settings
 
     //creating the object of type DrawView
     //in order to get the reference of the View
@@ -88,10 +92,9 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        askPermission();
 
-//        ActivityCompat.requestPermissions(this,
-//                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-//
+        navigationView = findViewById(R.id.bottom_navigation_menu);
 
         someActivityResultLauncher = registerForActivityResult( // todo: need to draw on selected image from gallery
                 // todo: as a solution - make method in DrawView, which will clear all paths of strokes in ArrayList and clear canvas
@@ -112,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
                                 Bitmap image = BitmapFactory.decodeStream(inputStream);
                                 Log.d(TAG, image + " ");
                                 Log.d(TAG, drawView + " ");
-                                Uri imageUri = drawView.getImageUri(this, image);
+                                Uri imageUri = drawView.getImageUri(MainActivity.this, image);
                                 Log.d(INSERT_IMAGE, "Image inserted");
                                 drawView.setImageUri(imageUri); // can be selectedImage value in here
                             } catch (FileNotFoundException e) {
@@ -121,8 +124,6 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
                         }
                     }
                 });
-
-        navigationView = findViewById(R.id.bottom_navigation_menu);
 
         navigationView.setOnItemSelectedListener(item -> {
 
@@ -205,12 +206,13 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
 
     }
 
-    private void openSocialNetworks() {
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, "Приложение name, скачивай от сюда - ссылка");
-        sendIntent.setType("text/plain");
-        startActivity(Intent.createChooser(sendIntent,"Поделиться"));
+    private void openSocialNetworks(Uri uri) {
+        Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+        intent.putExtra(Intent.EXTRA_STREAM, uri);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        intent.setType("image/jpeg"); // mb need to change to png
+        startActivity(intent);
+        Log.d(TAG, "Reached!");
     }
 
     @Override
@@ -231,14 +233,14 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
                 return true;
             case R.id.save_image:
                 askPermission();
-                saveImage();
+                saveImage(drawView.save());
                 return true;
             case R.id.import_image:
                 getImageGallery();
                 return true;
             case R.id.export_image:
-                openSocialNetworks();
-                Toast.makeText(this, R.string.export_picture, Toast.LENGTH_SHORT).show();
+                askPermission();
+                openSocialNetworks(drawView.getImageUri(this, drawView.save()));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -369,18 +371,20 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
      * it saves image go a gallery, so every app can get it and it will be public
      * Image saving in another thread, in a way not to make main thread too heavy
      */
-    private void saveImage() {
+    private Uri saveImage(Bitmap bitmap) {
         SaveThread mWorkerThread = new SaveThread("Saver");
+        final Uri[] uri = {null};
         Runnable task = new Runnable() {
             @Override
             public void run() {
                 if (drawView.hasPaths() && isGranted) {
+                    Date currentDate = new Date();
                     SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault());
                     String date = format.format(new Date());
+                    DateFormat timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+                    String timeText = timeFormat.format(currentDate);
                     String filename = date + ".jpg";
-//                    String filename = enterImageName() + ".jpg";
                     File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), filename);
-                    Bitmap bitmap = drawView.save();
                     try {
                         // code, which turns View to a byte and writes it to an image
                         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -391,7 +395,9 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
                         fos.flush();
                         fos.close();
                         // insert our picture to gallery
-                        MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "", "");
+                        MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, timeText, "desc");
+                        uri[0] = Uri.fromFile(file);
+                        Log.d(TAG, "Saved in gallery and External Storage");
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                         Toast.makeText(MainActivity.this, "File was not found!", Toast.LENGTH_SHORT).show();
@@ -407,7 +413,6 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
                         Toast.makeText(MainActivity.this, "Another Error occurred!", Toast.LENGTH_SHORT).show();
                     }
 
-
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -417,7 +422,7 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
                     mUiHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            Snackbar snackbar = Snackbar.make(layout, "Image saved!", Snackbar.LENGTH_SHORT);
+                            Snackbar snackbar = Snackbar.make(layout, R.string.image_saved, Snackbar.LENGTH_SHORT);
                             snackbar.setAction("OK", new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
@@ -427,7 +432,6 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
                             snackbar.show();
                         }
                     });
-
 
                 } else {
                     Snackbar snackbar = Snackbar.make(layout, R.string.no_permission, Snackbar.LENGTH_SHORT);
@@ -444,18 +448,30 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
         mWorkerThread.start();
         mWorkerThread.prepareHandler();
         mWorkerThread.postTask(task);
+
+        return uri[0];
+    }
+
+    /**
+     * Checks if the external storage is writable.
+     * @return true if storage is writable, false otherwise
+     */
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
     }
 
     @Override
     public void onDataReceived(String color) {
         drawView.setColor(Color.parseColor(color));
-//        colorPicker.setBackgroundColor(Color.parseColor(color));
     }
 
     @Override
     public void onDataReceived(int color) {
         drawView.setColor(color);
-//        colorPicker.setBackgroundColor(color);
     }
 
     @Override // What is wrong with all this ?????

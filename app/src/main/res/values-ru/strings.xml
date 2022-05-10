@@ -15,4 +15,11 @@
     <string name="no_permission">Ваш рисунок пустой или вы не дали доступ к памяти!</string>
     <string name="grant_permission_title">Предоставить разрешение</string>
     <string name="grant_permission_message">Если Вы хотите сохранить рисунок, вы выдолжны дать разрешение</string>
+    <string name="create_new_painting">создать</string>
+    <string name="paint">кисть</string>
+    <string name="color">цвет</string>
+    <string name="gallery">галерея</string>
+    <string name="share">Эй! Я делюсь своим рисунком, созданым в Ultimate Sketchbook!</string>
+    <string name="image_saved">Рисунок сохранён!!</string>
+
 </resources>

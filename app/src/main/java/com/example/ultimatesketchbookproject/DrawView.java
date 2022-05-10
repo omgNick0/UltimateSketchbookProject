@@ -41,7 +41,6 @@ public class DrawView extends View {
     private Path mPath;
     private Bitmap mBitmap;
     private Canvas mCanvas;
-    private final Paint mBitmapPaint = new Paint(Paint.DITHER_FLAG);
 
 
 
@@ -199,7 +198,7 @@ public class DrawView extends View {
     public Uri getImageUri(Context inContext, Bitmap inImage) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, " ", null);
         return Uri.parse(path);
     }
 
@@ -253,45 +252,4 @@ public class DrawView extends View {
 
         return true;
     }
-
-    protected void setImageBitmap(Bitmap bitmap) {
-        mCanvas.setBitmap(bitmap);
-    }
-
-
-
-//------------------------------------------------------------------
-// Line//
-// ------------------------------------------------------------------
-
-
-//private void onDrawLine (Canvas canvas) {
-//        float dx = Math.abs(mx - mStart)
-//}
-
-
-// code later  ....
-
-
-
-
-//------------------------------------------------------------------
-// Rectangle//
-// ------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

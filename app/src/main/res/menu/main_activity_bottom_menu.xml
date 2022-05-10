@@ -3,7 +3,7 @@
 
     <item
         android:id="@+id/btn_new_painting"
-        android:title="something here"
+        android:title="@string/create_new_painting"
         android:layout_width="wrap_content"
         android:layout_weight="1"
         android:layout_height="wrap_content"
@@ -13,7 +13,7 @@
 
     <item
         android:id="@+id/btn_stroke"
-        android:title="paint"
+        android:title="@string/paint"
         android:layout_width="wrap_content"
         android:layout_weight="1"
         android:layout_height="wrap_content"
@@ -22,7 +22,7 @@
 
     <item
         android:id="@+id/btn_color"
-        android:title="color"
+        android:title="@string/color"
         android:layout_width="wrap_content"
         android:layout_weight="1"
         android:layout_height="wrap_content"
@@ -31,10 +31,11 @@
 
     <item
         android:id="@+id/btn_gallery"
-        android:title="gallery"
+        android:title="@string/gallery"
         android:layout_width="wrap_content"
         android:layout_weight="1"
         android:layout_height="wrap_content"
+
         android:layout_gravity="end"
         android:icon="@drawable/ic_photo_library"/>
 
