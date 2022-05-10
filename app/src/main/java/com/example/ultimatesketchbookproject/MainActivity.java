@@ -207,12 +207,23 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
     }
 
     private void openSocialNetworks(Uri uri) {
-        Intent intent = new Intent(android.content.Intent.ACTION_SEND);
-        intent.putExtra(Intent.EXTRA_STREAM, uri);
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        intent.setType("image/jpeg"); // mb need to change to png
-        startActivity(intent);
-        Log.d(TAG, "Reached!");
+        if (drawView.hasPaths()) {
+            Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+            intent.putExtra(Intent.EXTRA_STREAM, uri);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.setType("image/jpeg"); // mb need to change to png
+            startActivity(intent);
+            Log.d(TAG, "Reached!");
+        } else {
+            Snackbar snackbar = Snackbar.make(layout, R.string.empty_draw, Snackbar.LENGTH_SHORT);
+            snackbar.setAction(R.string.ok, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    snackbar.dismiss();
+                }
+            });
+            snackbar.show();
+        }
     }
 
     @Override

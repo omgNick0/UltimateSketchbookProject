@@ -22,4 +22,5 @@
     <string name="gallery">gallery</string>
     <string name="share">Hey! I\'m sharing my picture, made in Ultimate Sketchbook App!</string>
     <string name="image_saved">image saved!</string>
+    <string name="empty_draw">You can\'t send empty image!</string>
 </resources>

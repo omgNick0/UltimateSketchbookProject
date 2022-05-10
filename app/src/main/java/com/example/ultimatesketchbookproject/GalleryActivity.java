@@ -8,15 +8,19 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
 
 import Adapters.GalleryAdapter;
+import Interfaces.RecyclerViewClickListener;
 
 public class GalleryActivity extends AppCompatActivity {
 
     // todo: recycler view on touch listener
+    private RecyclerViewClickListener listener;
 
     private static final String TAG = "GalleryActivity";
 
@@ -26,12 +30,22 @@ public class GalleryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
+        setOnClickListener();
         ArrayList<File> files = parseRootFolder(); // gets all files with full path and name
         RecyclerView recyclerView = findViewById(R.id.list);
         // создаем адаптер
-        GalleryAdapter adapter = new GalleryAdapter(this, images);
+        GalleryAdapter adapter = new GalleryAdapter(this, images, listener);
         setInitialData(files);        // устанавливаем для списка адаптер
         recyclerView.setAdapter(adapter);
+    }
+
+    private void setOnClickListener() {
+        listener = new RecyclerViewClickListener() {
+            @Override
+            public void onClick(View v, int position) {
+                Toast.makeText(GalleryActivity.this, "Touched!", Toast.LENGTH_SHORT).show();
+            }
+        };
     }
     private void setInitialData(ArrayList<File> fileArrayList ){
         for (File item: fileArrayList) {
