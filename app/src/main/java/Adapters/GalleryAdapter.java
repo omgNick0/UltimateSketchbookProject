@@ -1,6 +1,7 @@
 package Adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,6 +68,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         holder.imageView.setImageBitmap(state.getBitmap_image());
         holder.nameView.setText(state.getName());
         holder.dateView.setText(state.getDate());
+//        String text = holder.itemView.getContext().getString(holder.nameView.);
     }
 
     @Override

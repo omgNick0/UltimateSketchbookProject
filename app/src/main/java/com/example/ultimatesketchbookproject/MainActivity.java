@@ -2,9 +2,12 @@ package com.example.ultimatesketchbookproject;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -15,14 +18,20 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.provider.MediaStore;
 import android.text.InputType;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -36,8 +45,10 @@ import androidx.core.content.FileProvider;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.slider.RangeSlider;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.transition.MaterialArcMotion;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -51,6 +62,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Set;
 
 import Fragments.ColorsFragment;
 import ViewModels.StrokeViewModel;
@@ -65,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
     private DrawView drawView;
     //creating objects of type button
 
-//    private ExtendedFloatingActionButton gallery, colorPicker, stroke, instruments; // 4th btn to open chat with other users
+    //    private ExtendedFloatingActionButton gallery, colorPicker, stroke, instruments; // 4th btn to open chat with other users
     private BottomNavigationView navigationView;
     private RelativeLayout layout;
 
@@ -75,9 +87,11 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
 
     private static final int REQUEST_CODE = 123;
     private boolean isGranted = false;
+    private int color_new;
 
     private static final String TAG = "MainActivity";
     private static final String INSERT_IMAGE = "InsertImage";
+    private String image_name = "";
 
 //    private static final int REQUEST_GET_PHOTO = 1;
 
@@ -92,67 +106,23 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Log.d(TAG, "Created!");
+        // setRequestedOrientation(getResources().getConfiguration().orientation); // can block screen rotating here
+
         askPermission();
 
         navigationView = findViewById(R.id.bottom_navigation_menu);
 
-        someActivityResultLauncher = registerForActivityResult( // todo: need to draw on selected image from gallery
-                // todo: as a solution - make method in DrawView, which will clear all paths of strokes in ArrayList and clear canvas
-                // todo: but how draw on it...
-                // todo: возможно проблема в том что вызывается только в методе onCreate, соответственно DrawView не получается никакой информации
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        // There are no request codes
-                        Intent data = result.getData();
-                        if (data != null) {
-
-                            InputStream inputStream;
-                            Uri selectedImage = data.getData();
-
-                            try {
-                                inputStream = getContentResolver().openInputStream(selectedImage);
-                                Bitmap image = BitmapFactory.decodeStream(inputStream);
-                                Log.d(TAG, image + " ");
-                                Log.d(TAG, drawView + " ");
-                                Uri imageUri = drawView.getImageUri(MainActivity.this, image);
-                                Log.d(INSERT_IMAGE, "Image inserted");
-                                drawView.setImageUri(imageUri); // can be selectedImage value in here
-                            } catch (FileNotFoundException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                });
-
-        navigationView.setOnItemSelectedListener(item -> {
-
-            switch (item.getItemId()){
-                case R.id.btn_new_painting:
-                    makeNewPainting();
-                    break;
-                case R.id.btn_stroke:
-                    if (rangeSlider.getVisibility() == View.VISIBLE)
-                        rangeSlider.setVisibility(View.GONE);
-                    else
-                        rangeSlider.setVisibility(View.VISIBLE);
-                    break;
-                case R.id.btn_color:
-                    ColorsFragment fragment = new ColorsFragment(MainActivity.this);
-                    fragment.show(getSupportFragmentManager(), TAG);
-                    break;
-                case R.id.btn_gallery:
-                    startActivity(new Intent(MainActivity.this, GalleryActivity.class));
-                    break;
-            }
-            return true;
-        });
+        insertImage();
+        navigationViewManagment();
 
         layout = findViewById(R.id.main_layout);
         drawView = (DrawView) findViewById(R.id.draw_view);
         rangeSlider = (RangeSlider) findViewById(R.id.rangebar);
 
         strokeViewModel = new ViewModelProvider((this)).get(StrokeViewModel.class);
+
+//        strokeViewModel_2 = new ViewModelProvider(this).get(StrokeViewModel.class);
 
 //        Integer color = strokeViewModel.getColor().getValue();
 //
@@ -185,25 +155,97 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
                 drawView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 int width = drawView.getMeasuredWidth();
                 int height = drawView.getMeasuredHeight();
+                int color = drawView.getColor();
+                Log.d("Before:", drawView.getColor() + " "); // todo: all variables are null in here(0)
                 drawView.init(height, width);
+                Log.d(TAG, color_new + " ");
+                Log.d("After:", drawView.getColor() + "" );
+                if (strokeViewModel.getColor().getValue() != null) {
+                    strokeViewModel.setColor(color_new);
+                    Log.d(TAG, "got in here");
+                }
+                Log.d(TAG, "done...");
             }
         });
 
-        Integer color = strokeViewModel.getColor().getValue();
 
-        if (color == null && savedInstanceState != null) {
-            strokeViewModel.setColor(drawView.getColor());
-            drawView.setColor(savedInstanceState.getInt("color"));
-        }
-
-        if (savedInstanceState != null) {
-            drawView.setStrokeWidth(savedInstanceState.getInt("stroke_width"));
-        }
+//        Integer color = strokeViewModel.getColor().getValue();
+//
+//        if (color == null && savedInstanceState != null) {
+//            strokeViewModel.setColor(drawView.getColor());
+//            drawView.setColor(savedInstanceState.getInt("color"));
+//        }
+//
+//        if (savedInstanceState != null) {
+//            drawView.setStrokeWidth(savedInstanceState.getInt("stroke_width"));
+//        }
 
 //        if (state.strokeWidth != 0) {
 //            drawView.setStrokeWidth(state.strokeWidth);
 //        }
 
+    }
+
+    private void insertImage() {
+        someActivityResultLauncher = registerForActivityResult( // todo: need to draw on selected image from gallery
+                // todo: as a solution - make method in DrawView, which will clear all paths of strokes in ArrayList and clear canvas
+                // todo: but how draw on it...
+                // todo: возможно проблема в том что вызывается только в методе onCreate, соответственно DrawView не получается никакой информации
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        // There are no request codes
+                        Intent data = result.getData();
+                        if (data != null) {
+
+                            InputStream inputStream;
+                            Uri selectedImage = data.getData();
+
+                            try {
+                                inputStream = getContentResolver().openInputStream(selectedImage);
+                                Bitmap image = BitmapFactory.decodeStream(inputStream);
+
+                                Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
+
+                                Log.d(TAG, image + " ");
+                                Log.d(TAG, drawView + " ");
+                                Uri imageUri = drawView.getImageUri(MainActivity.this, bitmap);
+                                Log.d(INSERT_IMAGE, "Image inserted");
+                                drawView.setImageUri(imageUri);
+                               // drawView.setImageUri(imageUri); // can be selectedImage value in here
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                });
+    }
+
+    private void navigationViewManagment() {
+        navigationView.setOnItemSelectedListener(item -> {
+
+            switch (item.getItemId()) {
+                case R.id.btn_new_painting:
+                    makeNewPainting();
+                    break;
+                case R.id.btn_stroke:
+                    if (rangeSlider.getVisibility() == View.VISIBLE)
+                        rangeSlider.setVisibility(View.GONE);
+                    else
+                        rangeSlider.setVisibility(View.VISIBLE);
+                    break;
+                case R.id.btn_color:
+                    Log.d("Color: ", drawView.getColor() + " ");
+                    color_new = drawView.getColor();
+                    ColorsFragment fragment = new ColorsFragment(MainActivity.this);
+                    fragment.show(getSupportFragmentManager(), TAG);
+                    break;
+                case R.id.btn_gallery:
+                    startActivity(new Intent(MainActivity.this, GalleryActivity.class));
+                    break;
+            }
+            return true;
+        });
     }
 
     private void openSocialNetworks(Uri uri) {
@@ -244,7 +286,7 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
                 return true;
             case R.id.save_image:
                 askPermission();
-                saveImage(drawView.save());
+                getImageName();
                 return true;
             case R.id.import_image:
                 getImageGallery();
@@ -253,24 +295,72 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
                 askPermission();
                 openSocialNetworks(drawView.getImageUri(this, drawView.save()));
                 return true;
+            case R.id.settings:
+                startActivity(new Intent(MainActivity.this, Settings.class));
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
+    private void getImageName() {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(MainActivity.this);
+        builder.setTitle(R.string.save_title);
+        builder.setMessage(R.string.save_message);
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+
+        builder.setView(input);
+
+        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                image_name = input.getText().toString();
+                if (!image_name.equals("") && drawView.hasPaths()) {
+                    saveImage(drawView.save());
+                    Log.d(TAG, "image_name: " + image_name);
+                } else if (image_name.equals("") || !drawView.hasPaths() && (isGranted)) {
+                    Snackbar snackbar = Snackbar.make(layout, R.string.error_save, Snackbar.LENGTH_SHORT);
+                    snackbar.setAction(R.string.ok, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            snackbar.dismiss();
+                        }
+                    });
+                    snackbar.show();
+                } else if (!isGranted)
+                    askPermission();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, null);
+        builder.show();
+        Log.d(TAG, "image_name: " + image_name);
+    }
+
     private void makeNewPainting() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(MainActivity.this);
         builder.setTitle(R.string.new_painting_title);
         builder.setMessage(R.string.new_painting_desc);
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                drawView.makeNewPainting();
+                drawView.clearScreen();
             }
         });
         builder.setNegativeButton(R.string.cancel, null);
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
+        builder.show();
+
+//        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+//        builder.setTitle(R.string.new_painting_title);
+//        builder.setMessage(R.string.new_painting_desc);
+//        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialogInterface, int i) {
+//                drawView.makeNewPainting();
+//            }
+//        });
+//        builder.setNegativeButton(R.string.cancel, null);
+//        AlertDialog alertDialog = builder.create();
+//        alertDialog.show();
     }
 
     private void getImageGallery() {
@@ -284,7 +374,7 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
 
     private String enterImageName() { // todo: change function
         final String[] name = {""};
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this); // todo: material builder to set
         builder.setTitle(R.string.save_title);
 
 // Set up the input
@@ -312,15 +402,58 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
         return name[0];
     }
 
+
+//    private void setAppLanguage() {
+//        languages = findViewById(R.id.languages);
+//        rb_english = findViewById(R.id.english);
+//        rb_russian = findViewById(R.id.russian);
+//
+//        languages.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+//                switch (i) {
+//                    case R.id.english:
+//                        // When english selected
+//                        // Initialize string
+//                        String language = "en";
+//                        // and set locale
+//                        // todo: setlocalse(language);
+//
+//                }
+//            }
+//        });
+//
+//    }
+
+//    private void setLocale(String language) {
+//        // Initialize resources
+//        Resources resources = getResources();
+//        DisplayMetrics metrics = resources.getDisplayMetrics();
+//        // Initialize configuration
+//        Configuration configuration = resources.getConfiguration();
+//        // Initialize locale
+//        configuration.locale = new Locale(language);
+//        // Notify configuration
+//        onConfigurationChanged(configuration);
+//        Log.d(TAG, "Language changed to: " + language);
+//
+//    }
+
+//    @Override
+//    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+//        super.onConfigurationChanged(newConfig);
+//        // set strings from resources
+//        newConfig.set
+//    }
+
     private void askPermission() {
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)
                 + ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) { // Permissions are not granted
-            isGranted = false;
             if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) ||
                     ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 // Create AlertDialog
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(MainActivity.this);
                 builder.setTitle(R.string.grant_permission_title);
                 builder.setMessage(R.string.grant_permission_message);
                 builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
@@ -337,8 +470,7 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
                     }
                 });
                 builder.setNegativeButton(R.string.cancel, null);
-                AlertDialog alertDialog = builder.create();
-                alertDialog.show();
+                builder.show();
             } else {
                 ActivityCompat.requestPermissions(
                         MainActivity.this,
@@ -351,7 +483,7 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
             }
         } else { // When permissions are already granted
             isGranted = true;
-            Log.d(TAG, "Permission for reading and writing granted");
+            Log.d(TAG, "Permission for reading and writing granted" + "Granted: " + isGranted);
         }
     }
 
@@ -388,13 +520,8 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
         Runnable task = new Runnable() {
             @Override
             public void run() {
-                if (drawView.hasPaths() && isGranted) {
-                    Date currentDate = new Date();
-                    SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault());
-                    String date = format.format(new Date());
-                    DateFormat timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
-                    String timeText = timeFormat.format(currentDate);
-                    String filename = date + ".jpg";
+                if (isGranted) {
+                    String filename = image_name + ".jpg";
                     File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), filename);
                     try {
                         // code, which turns View to a byte and writes it to an image
@@ -406,7 +533,7 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
                         fos.flush();
                         fos.close();
                         // insert our picture to gallery
-                        MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, timeText, "desc");
+                        MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, image_name, "desc"); // todo: what description here ???
                         uri[0] = Uri.fromFile(file);
                         Log.d(TAG, "Saved in gallery and External Storage");
                     } catch (FileNotFoundException e) {
@@ -444,15 +571,6 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
                         }
                     });
 
-                } else {
-                    Snackbar snackbar = Snackbar.make(layout, R.string.no_permission, Snackbar.LENGTH_SHORT);
-                    snackbar.setAction(R.string.ok, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            askPermission();
-                        }
-                    });
-                    snackbar.show();
                 }
             }
         };
@@ -461,18 +579,6 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
         mWorkerThread.postTask(task);
 
         return uri[0];
-    }
-
-    /**
-     * Checks if the external storage is writable.
-     * @return true if storage is writable, false otherwise
-     */
-    public boolean isExternalStorageWritable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
     }
 
     @Override
@@ -516,15 +622,22 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
     protected void onResume() {
         super.onResume();
         ArrayList<Stroke> data = strokeViewModel.getLines().getValue();
-        Integer color = strokeViewModel.getColor().getValue();
+//        Integer color = strokeViewModel.getColor().getValue();
+
+//        strokeViewModel_2.
 
         if (data != null) {
             drawView.setPaths(data);
+//            drawView.setColor(color);
         }
         Log.d(TAG, "Resumed");
 
+//        strokeViewModel.setColor(color_new);
+//        drawView.setColor(color_new);
+
 //        if (color != null) {
-//            drawView.setColor(color);
+////            drawVi iew.setColor(color);
+//        }
 //        }
 
     }
@@ -534,7 +647,8 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
     protected void onPause() {
         super.onPause();
         strokeViewModel.setLines(drawView.getPaths());
-        strokeViewModel.setColor(drawView.getColor());
+        strokeViewModel.setColor(color_new);
+        Log.d(TAG, "Paused!");
     }
 
 }

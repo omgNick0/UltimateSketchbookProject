@@ -4,7 +4,9 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/drawable/background_splash.xml" value="0.2740740740740741" />
+        <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/drawable/drop_down_background.xml" value="0.2005" />
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/drawable/fragment_dialog.xml" value="0.1" />
+        <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/drawable/ic_android.xml" value="0.2005" />
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/drawable/ic_brush.xml" value="0.221875" />
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/drawable/ic_colorpicker.xml" value="0.22135416666666666" />
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/drawable/ic_dashboard_black_24dp.xml" value="0.25833333333333336" />
@@ -25,6 +27,7 @@
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/layout/activity_gallery.xml" value="0.25" />
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/layout/activity_main2.xml" value="0.22" />
+        <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/layout/activity_settings.xml" value="0.15" />
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/layout/alert_dialog_custom.xml" value="0.25" />
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/layout/fragment_dashboard.xml" value="0.2598958333333333" />
         <entry key="..\:/Users/nicko/AndroidStudioProjects/UltimateSketchbookProject/app/src/main/res/layout/fragment_description_and_title.xml" value="0.271875" />

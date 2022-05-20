@@ -14,6 +14,16 @@ public class StrokeViewModel extends ViewModel {
 
     MutableLiveData<Integer> color = new MutableLiveData<>();
 
+    MutableLiveData<Integer> value = new MutableLiveData<Integer>();
+
+    public void setValue(MutableLiveData<Integer> value) {
+        this.value = value;
+    }
+
+    public MutableLiveData<Integer> getValue() {
+        return value;
+    }
+
     public MutableLiveData<Integer> getColor() {
         return color;
     }
