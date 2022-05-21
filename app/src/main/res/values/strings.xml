@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">Ultimate Sketchbook Project</string>
+    <string name="app_name" translatable="false">Ultimate Sketchbook</string>
     <string name="import_picture">Import picture</string>
     <string name="export_picture">Export picture</string>
     <string name="save_picture">Save image</string>
@@ -12,7 +12,7 @@
     <string name="new_painting_desc">Are you sure you want to make a new painting?(You won\'t save the current)</string>
     <string name="save_title">Enter name of your picture</string>
     <string name="ok">OK</string>
-    <string name="no_permission">Your painting is empty or you didn\'t grant a permission!</string>
+    <string name="no_permission">You didn\'t grant a permission to your SD-card!</string>
     <string name="grant_permission_title">Grant permission</string>
     <string name="grant_permission_message">If you want to save your drawings, you need to grant permission</string>
     <string name="gallery_title" translatable="false">GALLERY</string>
@@ -22,4 +22,14 @@
     <string name="gallery">gallery</string>
     <string name="share">Hey! I\'m sharing my picture, made in Ultimate Sketchbook App!</string>
     <string name="image_saved">image saved!</string>
+    <string name="empty_draw">You can\'t send empty image!</string>
+    <string name="error_save">Your canvas or picture name can\'t be empty!</string>
+    <string name="change_painting_title">Set new picture name</string>
+    <string name="empty_name">Picture name can\'t be empty!</string>
+    <string name="settings_view" translatable="false">SETTINGS</string>
+    <string name="english">English</string>
+    <string name="russian">Russian</string>
+    <string name="select_language">Select a Language</string>
+    <string name="confirm_language">Confirm</string>
+    <string name="save_message">Enter image name(You can\'t save with empty name)</string>
 </resources>

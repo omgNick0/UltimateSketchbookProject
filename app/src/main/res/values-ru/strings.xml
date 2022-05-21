@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">Ultimate Sketchbook Project</string>
+    <string name="app_name" translatable="false">Ultimate Sketchbook</string>
     <string name="import_picture">Импортировать картинку</string>
     <string name="export_picture">Экспортировать картинку</string>
     <string name="save_picture">Сохранить картинку</string>
@@ -12,7 +12,7 @@
     <string name="new_painting_desc">Вы уверены что вы хотите создать новый рисунок?(Вы не сохраните текущий)</string>
     <string name="save_title">Введите название рисунка</string>
     <string name="ok">ОК</string>
-    <string name="no_permission">Ваш рисунок пустой или вы не дали доступ к памяти!</string>
+    <string name="no_permission">Вы не предоставили доступ к своей SD-карте!</string>
     <string name="grant_permission_title">Предоставить разрешение</string>
     <string name="grant_permission_message">Если Вы хотите сохранить рисунок, вы выдолжны дать разрешение</string>
     <string name="create_new_painting">создать</string>
@@ -21,5 +21,13 @@
     <string name="gallery">галерея</string>
     <string name="share">Эй! Я делюсь своим рисунком, созданым в Ultimate Sketchbook!</string>
     <string name="image_saved">Рисунок сохранён!!</string>
-
+    <string name="empty_draw">Вы не можете отправить пустой рисунок!</string>
+    <string name="error_save">Ваш холст и/или название рисунка не могут быть пустыми!</string>
+    <string name="change_painting_title">Введите новое название картинки</string>
+    <string name="empty_name">Новое имя рисунка не может быть пустым!</string>
+    <string name="english">Английский</string>
+    <string name="russian">Русский</string>
+    <string name="select_language">Выберите язык</string>
+    <string name="confirm_language">Подтвердить</string>
+    <string name="save_message">Введите название рисунка(Нельзя оставить имя пустым )</string>
 </resources>
