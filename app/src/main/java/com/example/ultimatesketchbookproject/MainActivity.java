@@ -240,7 +240,6 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
                 return true;
             case R.id.save_image:
                 askPermission();
-                saveImage(drawView.save());
                 getImageName();
                 return true;
             case R.id.import_image:
@@ -312,36 +311,6 @@ public class MainActivity extends AppCompatActivity implements PassDataColorInte
         builder.setNegativeButton(R.string.cancel, null);
         builder.show();
         Log.d(TAG, "image_name: " + image_name);
-    }
-
-    private String enterImageName() { // todo: change function
-        final String[] name = {""};
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.save_title);
-
-// Set up the input
-        final EditText input = new EditText(this);
-// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
-        builder.setView(input);
-
-// Set up the buttons
-        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                name[0] = input.getText().toString();
-            }
-        });
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-
-        builder.show();
-
-        return name[0];
     }
 
     private void askPermission() {

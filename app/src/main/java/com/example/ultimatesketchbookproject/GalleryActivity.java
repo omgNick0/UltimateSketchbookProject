@@ -1,15 +1,21 @@
 package com.example.ultimatesketchbookproject;
 
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -35,6 +41,7 @@ public class GalleryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
+        layout = findViewById(R.id.gallery_layout);
         setOnClickListener();
         ArrayList<File> files = parseRootFolder(); // gets all files with full path and name
         RecyclerView recyclerView = findViewById(R.id.list);
@@ -42,23 +49,6 @@ public class GalleryActivity extends AppCompatActivity {
         GalleryAdapter adapter = new GalleryAdapter(this, images, listener);
         setInitialData(files);        // устанавливаем для списка адаптер
         recyclerView.setAdapter(adapter);
-    }
-
-    private void setOnClickListener() {
-        listener = new RecyclerViewClickListener() {
-            @Override
-            public void onClick(View v, int position) {
-                Gallery val = images.get(position);
-                name = val.getName();
-//                String name_new = dialogOpen();
-//                val.setName(name_new);
-
-                Log.d(TAG, val.getName()); // gets name item from recycler view
-//                String name_new = dialogOpen();
-//                val.setName(name_new);
-//                dialogOpen(val.getName());
-            }
-        };
     }
 
     private void setInitialData(ArrayList<File> fileArrayList) {
@@ -105,37 +95,68 @@ public class GalleryActivity extends AppCompatActivity {
         }
     }
 
-//    private String dialogOpen() {
-//        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(GalleryActivity.this);
-//        builder.setTitle(R.string.change_painting_title);
-//        final EditText input = new EditText(this);
-//        input.setInputType(InputType.TYPE_CLASS_TEXT);
-//        input.setText(name);
-//        final String[] name_new = {""};
-//
-//        builder.setView(input);
-//
-//        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialogInterface, int i) {
-//                // check empty String
-//                if (!input.getText().toString().equals(" ")) {
-//                    name_new[0] = input.getText().toString(); // get new name
-//                } else { // if it's null
-//                    Snackbar snackbar = Snackbar.make(layout, R.string.empty_name, Snackbar.LENGTH_SHORT);
-//                    snackbar.setAction(R.string.ok, new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-//                            snackbar.dismiss();
-//                        }
-//                    });
-//                    snackbar.show();
-//                }
-//
-//            }
-//        });
-//        builder.setNegativeButton(R.string.cancel, null);
-//        builder.show();
-//        return name_new[0];
-//    }
+    private void setOnClickListener() {
+        listener = new RecyclerViewClickListener() {
+            @Override
+            public void onClick(View v, int position) {
+                Gallery val = images.get(position);
+                name = val.getName();
+
+                RecyclerView view = findViewById(R.id.list);
+
+                Log.d(TAG, val.getName()); // gets name item from recycler view
+
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(GalleryActivity.this);
+                builder.setTitle(R.string.change_painting_title);
+                final EditText input = new EditText(GalleryActivity.this);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                input.setText(name);
+
+                builder.setView(input);
+
+                builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // check empty String
+                        if (!input.getText().toString().equals("")) {
+                            if (input.getText().toString().contains(".jpg")) {
+                                val.setName(input.getText().toString());
+                                try {  // notifyItemChanged can produce nullPointerException, so wrap it in try-catch
+                                    view.getAdapter().notifyItemChanged(position);
+                                } catch (NullPointerException e) {
+                                    e.printStackTrace();
+                                }
+                            } else {
+                                val.setName(input.getText().toString() + ".jpg");
+                                try { // notifyItemChanged can produce nullPointerException, so wrap it in try-catch
+                                    view.getAdapter().notifyItemChanged(position);
+                                } catch (NullPointerException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            //name_new[0] = input.getText().toString(); // get new name
+                            Log.d(TAG, "not null text");
+                        } else { // if it's null
+                            try {
+                                Log.d(TAG, "null");
+                                Snackbar snackbar = Snackbar.make(layout, R.string.empty_name, Snackbar.LENGTH_SHORT);
+                                snackbar.setAction(R.string.ok, new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        snackbar.dismiss();
+                                    }
+                                });
+                                snackbar.show();
+                            } catch (NullPointerException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                });
+                builder.setNegativeButton(R.string.cancel, null);
+                builder.show();
+            }
+        };
+    }
+
 }
