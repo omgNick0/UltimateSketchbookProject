@@ -14,7 +14,7 @@
     <string name="ok">ОК</string>
     <string name="no_permission">Вы не предоставили доступ к своей SD-карте!</string>
     <string name="grant_permission_title">Предоставить разрешение</string>
-    <string name="grant_permission_message">Если Вы хотите сохранить рисунок, вы выдолжны дать разрешение</string>
+    <string name="grant_permission_message">Если Вы хотите сохранить рисунок, вы вы должны дать доступ к памяти устройства!</string>
     <string name="create_new_painting">создать</string>
     <string name="paint">кисть</string>
     <string name="color">цвет</string>
