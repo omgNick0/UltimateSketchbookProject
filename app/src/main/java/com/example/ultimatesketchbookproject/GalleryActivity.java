@@ -28,14 +28,18 @@ import Interfaces.RecyclerViewClickListener;
 
 public class GalleryActivity extends AppCompatActivity {
 
-    // todo: recycler view on touch listener
+
     private RecyclerViewClickListener listener;
 
     private static final String TAG = "GalleryActivity";
     private String name = "";
     private ConstraintLayout layout;
 
-    ArrayList<Gallery> images = new ArrayList<>();
+    private String path;
+    private File dir;
+    private ArrayList<File> files;
+
+    private ArrayList<Gallery> images = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,16 +59,15 @@ public class GalleryActivity extends AppCompatActivity {
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault());
         String date = format.format(new Date());
         for (File item : fileArrayList) {
-//            String filename = item.toString().substring(0, item.toString().indexOf("Pictures/"));
             int index = item.toString().lastIndexOf("/");
             images.add(new Gallery(item.toString().substring(index + 1), date, loadFromFile(item)));
         }
     }
 
     private ArrayList<File> parseRootFolder() {
-        String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath();
-        File dir = new File(path);
-        ArrayList<File> files = new ArrayList<>();
+        path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath();
+        dir = new File(path);
+        files = new ArrayList<>();
         if (dir.exists() && dir.isDirectory()) {
             try {
                 for (File item : dir.listFiles()) {
@@ -119,23 +122,30 @@ public class GalleryActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         // check empty String
                         if (!input.getText().toString().equals("")) {
-                            if (input.getText().toString().contains(".jpg")) {
-                                val.setName(input.getText().toString());
-                                try {  // notifyItemChanged can produce nullPointerException, so wrap it in try-catch
-                                    view.getAdapter().notifyItemChanged(position);
-                                } catch (NullPointerException e) {
-                                    e.printStackTrace();
-                                }
-                            } else {
+                            if (!input.getText().toString().contains(".jpg")) {
                                 val.setName(input.getText().toString() + ".jpg");
                                 try { // notifyItemChanged can produce nullPointerException, so wrap it in try-catch
                                     view.getAdapter().notifyItemChanged(position);
                                 } catch (NullPointerException e) {
                                     e.printStackTrace();
                                 }
+                            } else {
+                                val.setName(input.getText().toString());
                             }
-                            //name_new[0] = input.getText().toString(); // get new name
-                            Log.d(TAG, "not null text");
+
+                            try {  // notifyItemChanged can produce nullPointerException, so wrap it in try-catch
+                                view.getAdapter().notifyItemChanged(position);
+                                for (File item : dir.listFiles()) {
+                                    System.out.println("item - " + item);
+                                    if (item.getName().equals(name)) {
+                                        File myFoo = new File(item.getAbsolutePath());
+                                        files.add(myFoo);
+                                    }
+
+                                }
+                            } catch (NullPointerException e) {
+                                e.printStackTrace();
+                            }
                         } else { // if it's null
                             try {
                                 Log.d(TAG, "null");

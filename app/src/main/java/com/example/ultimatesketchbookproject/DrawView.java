@@ -134,9 +134,9 @@ public class DrawView extends View {
 
     //this is the main method where the actual drawing takes place
 
-        // Need to switch current shapes and extc... github library
-        //save the current state of the canvas before,
-        //to draw the background of the canvas
+    // Need to switch current shapes and extc... github library
+    //save the current state of the canvas before,
+    //to draw the background of the canvas
     @Override
     protected void onDraw(Canvas canvas) {
         canvas.save();

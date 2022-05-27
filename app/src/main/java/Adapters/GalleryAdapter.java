@@ -67,7 +67,6 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         holder.imageView.setImageBitmap(state.getBitmap_image());
         holder.nameView.setText(state.getName());
         holder.dateView.setText(state.getDate());
-//        String text = holder.itemView.getContext().getString(holder.nameView.);
     }
 
     @Override
