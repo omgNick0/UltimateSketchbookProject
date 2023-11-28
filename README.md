@@ -10,7 +10,7 @@ Ultimate Sketchbook is an android app, where you can make your little sketches a
 - Load any picture format you want(jpg, jpeg, png)
 
 
-## Wath how it works!
+## Watch how it works!
 
 
 ![to_git](https://user-images.githubusercontent.com/74779897/170860232-e5e5fc8d-4ddc-4ddb-ae8d-33a33c98686e.gif)
@@ -32,7 +32,7 @@ More technologies in future.
 
 You need to copy and clone my project to android studio(My version on 28.02.2022 - Bumblebee 2021.1.1)
 
-If you have some errors, then you need to checkout build.gradle files
+If you have errors, then you need to checkout build.gradle files
 
 ```sh
 git clone https://github.com/https404error/UltimateSketchbookProject
